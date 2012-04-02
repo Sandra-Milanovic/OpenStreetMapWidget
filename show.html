@@ -1,0 +1,45 @@
+<html>
+<head>
+<link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
+<!--[if lte IE 8]>
+<link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" />
+<![endif]-->
+</head>
+<body>
+<div id="map" style="height: 400px"></div>
+<script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
+<script type="text/javascript">
+//show.html?lat=lat&lngr=lng&zoom=zoom&marker=lat,lng
+var getParams = function() {
+	var params = {}, 
+		paramArray = window.location.search.substr(1).split("&");
+	for (var k = 0; k < paramArray.length; ++k) {
+		var single = paramArray[k].split("=");
+		params[single[0]] = single[1] 
+	}
+	return params; 
+};
+
+var params = getParams();
+console.log (params);
+var markerArray = params.marker.split(","),
+	markerLat = markerArray[0],
+	markerLng = markerArray[1];
+var map = new L.Map('map');
+var layer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+	attribution:'Copyright (C) OpenStreetMap.org',
+	maxZoom:18
+});
+ 
+map.addLayer(layer);
+ 
+map.setView(new L.LatLng(params.lat,params.lng), params.zoom);
+
+var markerLocation = new L.LatLng(markerLat, markerLng);
+
+var marker = new L.Marker(markerLocation);
+map.addLayer(marker);
+ 
+</script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<html>
+<head>
+<link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
+<!--[if lte IE 8]>
+<link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" />
+<![endif]-->
+</head>
+<body>
+<div id="map" style="height: 400px"></div>
+<input type="button" id="placeButton" value="Place Marker" />
+<input type="button" id="generateLink" value="Create Link" />
+ 
+<div id="dialog" style="display:none;">
+	<a href="">Link to this map</a>:
+	<textarea rows="5" cols="60"></textarea>
+<div>
+ 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
+<script type="text/javascript">
+ 
+var map = new L.Map('map');
+var layer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+	attribution:'Copyright (C) OpenStreetMap.org',
+	maxZoom:18
+});
+ 
+map.addLayer(layer);
+ 
+map.setView(new L.LatLng(41.99477,21.42785), 8);
+ 
+ 
+var putParams = function(obj) {
+	var arrayStr = [];
+	for (key in obj) {
+		arrayStr.push(key + "=" + obj[key]);
+	}
+	return arrayStr.join("&");
+}
+ 
+$(document).ready(function() {
+	var placeMark = null;
+ 
+	var placementMode = false;
+	map.on("click", function(e){	
+		if (placementMode) {
+			if (placeMark) {
+				map.removeLayer(placeMark);
+			}
+			placeMark = new L.Marker(e.latlng);
+			map.addLayer(placeMark);
+			placementMode = !placementMode;
+			if (placementMode) {
+				$("#placeButton").css("background-color", "#dd8");
+			}
+			else {
+				$("#placeButton").css("background-color", "#ccc");
+			}
+
+		}
+	});
+	$("#placeButton").click(function() {
+		placementMode = !placementMode;
+		if (placementMode) {
+			$("#placeButton").css("background-color", "#dd8");
+		}
+		else {
+			$("#placeButton").css("background-color", "#ccc");
+		}
+	});
+	var dialogVisible = false;
+	$("#generateLink").click(function() {
+		dialogVisible = !dialogVisible;
+		if (dialogVisible) {
+			$("#dialog").show().css({
+				top: 0.5 * ($(window).height() - $("#dialog").height()),
+				left: 0.5 * ($(window).width() - $("#dialog").width())
+			});
+			var markerLatLng = placeMark.getLatLng(); 
+			var mapPosition = map.getCenter();
+			var mapZoom = map.getZoom();
+			var link = 	"show.html?" + putParams({
+				marker: markerLatLng.lat + "," + markerLatLng.lng, 
+				lat: mapPosition.lat,
+				lng: mapPosition.lng,
+				zoom: mapZoom 
+			});
+			$("#dialog a").attr("href", link);
+			$("#dialog textarea").val(link);
+		}
+		else { $("#dialog").hide(); }
+	});
+});
+ 
+</script>
+</body>
+</html>
