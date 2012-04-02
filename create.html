@@ -1,5 +1,12 @@
 <html>
 <head>
+	<style type="text/css">
+		input[type='button'] {
+			background-color:#ccc;
+			color:#000;
+			border: solid 1px #999;
+		}
+	</style>
 <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
 <!--[if lte IE 8]>
 <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" />
@@ -49,14 +56,8 @@ $(document).ready(function() {
 			}
 			placeMark = new L.Marker(e.latlng);
 			map.addLayer(placeMark);
-			placementMode = !placementMode;
-			if (placementMode) {
-				$("#placeButton").css("background-color", "#dd8");
-			}
-			else {
-				$("#placeButton").css("background-color", "#ccc");
-			}
-
+			placementMode = false;
+			$("#placeButton").css({"background-color": "#ccc"});
 		}
 	});
 	$("#placeButton").click(function() {
