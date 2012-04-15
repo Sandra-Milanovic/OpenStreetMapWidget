@@ -1,42 +1,48 @@
 <html>
 <head>
 	<style type="text/css">
-		input[type='button'] {
+		body {
+			margin:0; padding:0;	
+		}
+		#toolbar {
+			position:absolute;
+			top:0;
+			right: 0;
+			width:100%;
+		}
+		#toolbar input[type='button'] {
+			float:right;
 			background-color:#ccc;
 			color:#000;
 			border: solid 1px #999;
 		}
 	</style>
-<link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
-<!--[if lte IE 8]>
-<link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" />
-<![endif]-->
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/south-street/jquery-ui.css" />
+	<link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
+	<!--[if lte IE 8]>
+	<link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" />
+	<![endif]-->
 </head>
 <body>
 <div id="map" style="height: 400px"></div>
-<input type="button" id="placeButton" value="Place Marker" />
-<input type="button" id="generateLink" value="Create Link" />
- 
+
 <div id="dialog" style="display:none;">
 	<a href="">Link to this map</a>:
-	<textarea rows="5" cols="60"></textarea>
-<div>
- 
+	<textarea id="link" rows="5" style="width:100%"></textarea>
+	Embed on your site using an iframe
+	<textarea id="iframe" rows="5" style="width:100%"></textarea>
+</div>
+<div id="toolbar">
+	<input type="button" id="placeButton" value="Place Marker" />
+	<input type="button" id="generateLink" value="Create Link" />
+</div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
 <script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
 <script type="text/javascript">
- 
-var map = new L.Map('map');
-var layer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-	attribution:'Copyright (C) OpenStreetMap.org',
-	maxZoom:18
-});
- 
-map.addLayer(layer);
- 
-map.setView(new L.LatLng(41.99477,21.42785), 8);
- 
- 
+
+
+
 var putParams = function(obj) {
 	var arrayStr = [];
 	for (key in obj) {
@@ -46,6 +52,27 @@ var putParams = function(obj) {
 }
  
 $(document).ready(function() {
+
+
+	$("#dialog").dialog({
+		autoOpen:false,
+		bgIframe:true,
+		title:"Embed map",
+		width:500,
+		height:340
+	});
+	$("#map").width($(window).width());
+	$("#map").height($(window).height());
+
+	var map = new L.Map('map');
+	var layer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+		attribution:'Copyright (C) OpenStreetMap.org',
+		maxZoom:18
+	});
+	map.addLayer(layer);
+	map.setView(new L.LatLng(41.99477,21.42785), 8);
+
+
 	var placeMark = null;
  
 	var placementMode = false;
@@ -73,21 +100,27 @@ $(document).ready(function() {
 	$("#generateLink").click(function() {
 		dialogVisible = !dialogVisible;
 		if (dialogVisible) {
-			$("#dialog").show().css({
-				top: 0.5 * ($(window).height() - $("#dialog").height()),
-				left: 0.5 * ($(window).width() - $("#dialog").width())
-			});
+			$("#dialog").dialog('open');
+			var hostPart = window.location.toString().split("#")[0];
+			hostPart = hostPart.substr(0, hostPart.lastIndexOf('/'));
+			//.css({
+			//	top: 0.5 * ($(window).height() - $("#dialog").height()),
+			//	left: 0.5 * ($(window).width() - $("#dialog").width())
+			//});
 			var markerLatLng = placeMark.getLatLng(); 
 			var mapPosition = map.getCenter();
 			var mapZoom = map.getZoom();
-			var link = 	"show.html?" + putParams({
+			var link = hostPart + "/show.html?" + putParams({
 				marker: markerLatLng.lat + "," + markerLatLng.lng, 
 				lat: mapPosition.lat,
 				lng: mapPosition.lng,
 				zoom: mapZoom 
 			});
+			
+			var embedIframe = ['<iframe src="',link,'" width="480" height="420"></iframe>'].join("");
 			$("#dialog a").attr("href", link);
-			$("#dialog textarea").val(link);
+			$("#dialog #link").val(link);
+			$("#dialog #iframe").val(embedIframe);
 		}
 		else { $("#dialog").hide(); }
 	});
