@@ -31,14 +31,17 @@
 	<textarea id="link" rows="5" style="width:100%"></textarea>
 	Embed on your site using an iframe
 	<textarea id="iframe" rows="5" style="width:100%"></textarea>
+	Shortened link
+	<input id="shortlink" type="text" style="width:100%"/>
 </div>
-<div id="toolbar">
+<div id="toolbar" style="z-index: 10;">
 	<input type="button" id="placeButton" value="Place Marker" />
 	<input type="button" id="generateLink" value="Create Link" />
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
 <script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
+<script type="text/javascript" src="bitly/jquery.bitly.js"></script>
 <script type="text/javascript">
 
 
@@ -50,6 +53,23 @@ var putParams = function(obj) {
 	}
 	return arrayStr.join("&");
 }
+
+var setShortLink = function(longURL) {
+	$.get(
+		"https://api-ssl.bitly.com/v3/shorten",
+		{
+			access_token: "9e6943f1fa1d50b25cd1cca6e5437a9ab5f2a1a7",
+		 	longUrl: longURL
+		},
+		function(data) {
+			$("#shortlink").val(data['data']['url'])
+		});
+}
+
+$(window).resize(function (){
+	$("#map").width($(window).width());
+	$("#map").height($(window).height());
+})
  
 $(document).ready(function() {
 
@@ -59,7 +79,7 @@ $(document).ready(function() {
 		bgIframe:true,
 		title:"Embed map",
 		width:500,
-		height:340
+		height:400
 	});
 	$("#map").width($(window).width());
 	$("#map").height($(window).height());
@@ -71,7 +91,6 @@ $(document).ready(function() {
 	});
 	map.addLayer(layer);
 	map.setView(new L.LatLng(41.99477,21.42785), 8);
-
 
 	var placeMark = null;
  
@@ -103,26 +122,30 @@ $(document).ready(function() {
 			$("#dialog").dialog('open');
 			var hostPart = window.location.toString().split("#")[0];
 			hostPart = hostPart.substr(0, hostPart.lastIndexOf('/'));
-			//.css({
-			//	top: 0.5 * ($(window).height() - $("#dialog").height()),
-			//	left: 0.5 * ($(window).width() - $("#dialog").width())
-			//});
-			var markerLatLng = placeMark.getLatLng(); 
+
 			var mapPosition = map.getCenter();
 			var mapZoom = map.getZoom();
 			var link = hostPart + "/show.html?" + putParams({
-				marker: markerLatLng.lat + "," + markerLatLng.lng, 
 				lat: mapPosition.lat,
 				lng: mapPosition.lng,
 				zoom: mapZoom 
 			});
+
+			if (placeMark != undefined) {
+				var markerLatLng = placeMark.getLatLng();
+				link += "&" + putParams({marker: markerLatLng.lat + "," + markerLatLng.lng})
+			}
 			
 			var embedIframe = ['<iframe src="',link,'" width="480" height="420"></iframe>'].join("");
 			$("#dialog a").attr("href", link);
 			$("#dialog #link").val(link);
 			$("#dialog #iframe").val(embedIframe);
+
+			setShortLink(link);
 		}
-		else { $("#dialog").hide(); }
+		else { 
+			$("#dialog").hide(); 
+		}
 	});
 });
  

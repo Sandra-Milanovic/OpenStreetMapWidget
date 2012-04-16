@@ -19,19 +19,28 @@
 <script type="text/javascript">
 //show.html?lat=lat&lngr=lng&zoom=zoom&marker=lat,lng
 var getParams = function() {
-	var params = {}, 
-	    paramArray = window.location.search.substr(1).split("&");
+	var params = {}; 
+	var paramArray = window.location.search.substr(1).split("&");
 	for (var k = 0; k < paramArray.length; ++k) {
 		var single = paramArray[k].split("=");
 		params[single[0]] = single[1] 
 	}
 	return params; 
 };
+
+$(window).resize(function (){
+	$("#map").width($(window).width());
+	$("#map").height($(window).height());
+})
+
 $(document).ready(function() {
 	var params = getParams();
-	var markerArray = params.marker.split(","),
-	markerLat = markerArray[0],
-	markerLng = markerArray[1];
+	if ("marker" in params) {
+		var markerArray = params.marker.split(","),
+		markerLat = markerArray[0],
+		markerLng = markerArray[1];
+	}
+	
 	$("#map").width($(window).width());
 	$("#map").height($(window).height()); 
 	var map = new L.Map('map');
@@ -44,10 +53,11 @@ $(document).ready(function() {
 	map.addLayer(layer);
 	map.setView(new L.LatLng(params.lat,params.lng), params.zoom);
 
-	var markerLocation = new L.LatLng(markerLat, markerLng);
-
-	var marker = new L.Marker(markerLocation);
-	map.addLayer(marker);
+	if ("marker" in params) {
+		var markerLocation = new L.LatLng(markerLat, markerLng);
+		var marker = new L.Marker(markerLocation);
+		map.addLayer(marker);
+	}
 });
 
 </script>
