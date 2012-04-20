@@ -1,50 +1,51 @@
 <html>
 <head>
-	<style type="text/css">
-		body {
-			margin:0; padding:0;	
-		}
-		#toolbar {
-			position:absolute;
-			top:0;
-			right: 0;
-			width:100%;
-		}
-		#toolbar input[type='button'] {
-			float:right;
-			background-color:#ccc;
-			color:#000;
-			border: solid 1px #999;
-		}
-	</style>
-	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/south-street/jquery-ui.css" />
-	<link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css" />
-	<!--[if lte IE 8]>
-	<link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" />
-	<![endif]-->
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #toolbar {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+        }
+
+        #toolbar input[type='button'] {
+            float: right;
+            background-color: #ccc;
+            color: #000;
+            border: solid 1px #999;
+        }
+    </style>
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/south-street/jquery-ui.css"/>
+    <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css"/>
+    <!--[if lte IE 8]>
+    <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css"/>
+    <![endif]-->
 </head>
 
 <body>
 <div id="map" style="height: 400px"></div>
 <div id="dialog" style="display:none;">
-	<a href="">Link to this map</a>:
-	<textarea id="link" rows="5" style="width:100%"></textarea>
-	Embed on your site using an iframe
-	<textarea id="iframe" rows="5" style="width:100%"></textarea>
-	Shortened link
-	<input id="shortlink" type="text" style="width:100%"/>
+    <a class="shortLink">Short link to this map:</a>
+    <input class="shortLink" type="text" style="width:100%"/>
+    Embed on your site using an iframe
+    <textarea id="iframe" rows="5" style="width:100%"></textarea>
+    <a class="link" href="">Full link</a>:
+    <textarea class="link" rows="5" style="width:100%"></textarea>
 </div>
 <div id="toolbar" style="z-index: 10;">
-	<input type="button" id="placeButton" value="Place Marker" />
-	<input type="button" id="generateLink" value="Create Link" />
+    <input type="button" id="placeButton" value="Place Marker"/>
+    <input type="button" id="generateLink" value="Create Link"/>
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
 <script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
-<script type="text/javascript" src="bitly/jquery.bitly.js"></script>
+<!--<script type="text/javascript" src="bitly/jquery.bitly.js"></script>-->
 <script type="text/javascript">
-
-
 
 var putParams = function(obj) {
 	var arrayStr = [];
@@ -110,12 +111,6 @@ $(document).ready(function() {
 		}
 	});
 	
-	if (placeMark) {
-		placeMark.on("dblclick", function(e){
-			map.removeLayer(placeMark);
-	});
-	}
-
 	$("#placeButton").click(function() {
 		placementMode = !placementMode;
 		if (placementMode) {
