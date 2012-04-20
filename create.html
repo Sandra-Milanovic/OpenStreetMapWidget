@@ -23,9 +23,9 @@
 	<link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.ie.css" />
 	<![endif]-->
 </head>
+
 <body>
 <div id="map" style="height: 400px"></div>
-
 <div id="dialog" style="display:none;">
 	<a href="">Link to this map</a>:
 	<textarea id="link" rows="5" style="width:100%"></textarea>
@@ -104,8 +104,19 @@ $(document).ready(function() {
 			map.addLayer(placeMark);
 			placementMode = false;
 			$("#placeButton").css({"background-color": "#ccc"});
+			placeMark.on("dblclick", function(e){
+			map.removeLayer(placeMark);
+			});
 		}
 	});
+	
+	if (placeMark) {
+		placeMark.on("dblclick", function(e){
+			alert('asd')
+			// map.removeLayer(placeMark);
+	});
+	}
+
 	$("#placeButton").click(function() {
 		placementMode = !placementMode;
 		if (placementMode) {
