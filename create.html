@@ -19,6 +19,27 @@
             color: #000;
             border: solid 1px #999;
         }
+
+        #introScreen a.button {
+            display: block;
+            width: 43%;
+            float: left;
+            margin:auto;
+        }
+
+        #introScreen div.explanation {
+            display: block;
+            width: 53%;
+            float: right;
+        }
+
+        #introScreen div.block {
+            margin-top: 10px;
+            float: left;
+            clear: both;
+        }
+
+
     </style>
     <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/south-street/jquery-ui.css"/>
     <link rel="stylesheet" href="http://code.leafletjs.com/leaflet-0.3.1/leaflet.css"/>
@@ -28,6 +49,33 @@
 </head>
 <body>
 <div id="map" style="height: 400px"></div>
+<div id="introScreen" style="height: 512px; width:768px;">
+    <div class="block">
+        <a href="#" id="openPlacemarkEditor" class="button">Create a placemark map</a>
+
+        <div class="explanation">
+            Create a map with a single place marked on
+            the map. When someone opens the map, they will
+            be shown the place and its description and they will
+            get directions on how to arrive to the place from
+            location
+        </div>
+    </div>
+    <div class="block">
+        <a href="#" id="openRouteEditor" class="button">Create a route map</a>
+
+        <div class="explanation">
+            Create a map which displays a fixed, pre-defined route and multiple placemarks (optional)
+        </div>
+    </div>
+    <div class="block">
+        <a href="#" id="openAdvancedEditor" class="button">Create an advanced map</a>
+
+        <div class="explanation">
+            Create a map which contains multiple placemarks, routes and other shapes
+        </div>
+    </div>
+</div>
 
 <div id="dialog" style="display:none;">
     <a class="shortLink">Short link to this map:</a>
@@ -73,6 +121,7 @@
 
     $(document).ready(function () {
 
+        $('a.button').button();
 
         $("#dialog").dialog({
             autoOpen:false,
@@ -80,6 +129,13 @@
             title:"Embed map",
             width:500,
             height:400
+        });
+        $("#introScreen").dialog({
+            autoOpen:true,
+            bgIframe:true,
+            title:"Welcome to osmwidget",
+            width:640,
+            height:380
         });
         $("#map").width($(window).width());
         $("#map").height($(window).height());
