@@ -149,17 +149,24 @@
         map.setView(new L.LatLng(41.99477, 21.42785), 8);
 
         var placeMark = null;
+        var placeMark2 = null;
 
         var placementMode = false;
-        map.on("click", function (e) {
+            map.on("click", function(e){    
             if (placementMode) {
                 if (placeMark) {
                     map.removeLayer(placeMark);
-                }
-                placeMark = new L.Marker(e.latlng);
-                map.addLayer(placeMark);
-                placementMode = false;
-                $("#placeButton").css({"background-color":"#ccc"});
+                    }
+                    placeMark = new L.Marker(e.latlng, {draggable:true});
+                    map.addLayer(placeMark);
+                    placementMode = false;
+                    $("#placeButton").css({"background-color": "#ccc"});
+                    placeMark.on("dragend", function(e){
+                        // console.log(placeMark);
+                    });
+                    placeMark.on("dblclick", function(e){
+                        map.removeLayer(placeMark);
+                    });
             }
         });
         $("#placeButton").click(function () {
@@ -173,6 +180,7 @@
         });
         var dialogVisible = false;
         $("#generateLink").click(function () {
+            console.log(placeMark);
             $("#dialog").dialog('open');
             var hostPart = window.location.toString().split("#")[0];
             hostPart = hostPart.substr(0, hostPart.lastIndexOf('/'));
