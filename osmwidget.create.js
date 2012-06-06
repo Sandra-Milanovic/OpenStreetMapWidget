@@ -33,6 +33,7 @@ $(document).ready(function () {
         height:400
     });
     $("#introScreen").dialog({
+        modal:true,
         autoOpen:true,
         bgIframe:true,
         title:"Welcome to osmwidget",
