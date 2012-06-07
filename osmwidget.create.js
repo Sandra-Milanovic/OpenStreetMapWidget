@@ -54,9 +54,62 @@ $(document).ready(function () {
     var placeMark = null;
     // var placeMark2 = null;
 
+    var Editor = (function() {
+        var self = {};
+        self.defaultMode = {
+            init: function() {},
+            onClickMap: function() {},
+        };
+        self.targetMode = {
+            init: function() { }
+
+        }
+        self.currentMode = self.defaultMode;
+        self.setMode = function(m) {
+            self.currentMode = m;
+            m.init();
+        }
+    }());
+
+    // Monkey-patch L.Marker to support right-click events
+    var originalFunction = L.Marker.prototype.on;
+    L.Marker.prototype.on = function(ev, fn) {
+        if (ev == 'contextmenu') $(this._icon).bind('contextmenu', fn)
+        else originalFunction.apply(this, arguments);
+    };
+
+    /* Testing JS prototypes */
+    var MyConstructor = function() {
+        this._myVar = 5;
+    };
+
+    MyConstructor.prototype.myFunc = function() {
+        console.log(this._myVar);
+    }
+
+
+    MyConstructorO_prototype = {};
+    MyConstructorO_prototype.myFunc = function() {
+        console.log(this._myVar);
+    }
+    var MyConstructorO = function() {
+        var self = Object.create(MyConstructorO_prototype);
+        self._myVar = 5;
+        return self;
+    }
+
+
+    var myobj = new MyConstructor();
+    //myobj.myFunc();
+    var myobjo = MyConstructorO();
+    //myobjo.myFunc();
+
+    /* Editor */
+    
     var placementMode = false;
         map.on("click", function(e){    
         if (placementMode) {
+            
             if (placeMark) {
                 map.removeLayer(placeMark);
                 }
@@ -68,8 +121,10 @@ $(document).ready(function () {
                     // console.log(placeMark);
                 });
                 placeMark.on("dblclick", function(e){
-                    map.removeLayer(placeMark);
+                    console.log(placeMark);
+                    //map.removeLayer(placeMark);
                 });
+                placeMark.on("contextmenu", function() { alert("Hello rightclick!"); });
         }
     });
     $("#placeButton").click(function () {
