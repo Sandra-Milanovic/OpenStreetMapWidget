@@ -139,6 +139,7 @@ $(document).ready(function () {
     var dialogVisible = false;
     $("#generateLink").click(function () {
         console.log(placeMark);
+        $("#dialog").dialog({modal:true});
         $("#dialog").dialog('open');
         var hostPart = window.location.toString().split("#")[0];
         hostPart = hostPart.substr(0, hostPart.lastIndexOf('/'));
