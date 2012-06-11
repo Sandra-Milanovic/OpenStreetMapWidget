@@ -14,7 +14,7 @@
 </head>
 <body>
 <div id="map" style="height: 400px"></div>
-<div id="introScreen" style="height: 512px; width:768px;">
+<div id="introScreen" style="display:none;">
     <div class="block">
         <a href="#" id="openPlacemarkEditor" class="button">Create a placemark map</a>
 
@@ -45,7 +45,7 @@
 <div id="dialog" style="display:none;">
     <a class="shortLink">Short link to this map:</a>
     <input class="shortLink" type="text" style="width:100%"/>
-    <div style="margin:0.2em 0">
+    <div style="margin:0.5em 0">
         <a class="button mobileOnly" id="sendSms">SMS Link</a>
         <a class="button" id="sendEmail">Email Link</a>
     </div>
@@ -53,8 +53,8 @@
     <textarea id="iframe" rows="5" style="width:100%"></textarea>
 </div>
 <div id="toolbar" style="z-index: 10;">
-    <a class="button" id="placeButton">Place Marker</a>
-    <a class="button" id="generateLink">Create Link</a>
+    <a class="button" id="placeButton">Set Target</a>
+    <a class="button" id="generateLink">Share Map</a>
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>

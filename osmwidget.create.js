@@ -29,17 +29,22 @@ $(document).ready(function () {
         autoOpen:false,
         bgIframe:true,
         title:"Embed map",
-        width:Math.min(500, $(window).width() * 0.9),
-        height:Math.min(270, $(window).height() * 0.9)
+        width:Math.min(500, $(window).width() * 0.9)
+        //height:Math.min(320, $(window).height() * 0.9)
     });
     $("#introScreen").dialog({
         modal:true,
         autoOpen:true,
         bgIframe:true,
         title:"Welcome to osmwidget",
-        width:Math.min(640, $(window).width() * 0.9),
-        height:Math.min(480, $(window).height() * 0.9)
+        width:Math.min(640, $(window).width() * 0.9)
+        //height:Math.min(480, $(window).height() * 0.9)
     });
+
+    $("#openPlacemarkEditor").bind('click', function () {
+        $("#introScreen").dialog('close');
+    });
+
     $("#map").width($(window).width());
     $("#map").height($(window).height());
 
@@ -53,14 +58,12 @@ $(document).ready(function () {
 
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
-            map.setView(
-                new L.LatLng(position.coords.latitude, position.coords.longitude),
-                14);
+            var latlng = new L.LatLng(position.coords.latitude, position.coords.longitude);
+            setTarget(latlng);
+            map.setView(latlng, 14);
         });
     }
 
-    var placeMark = null;
-    // var placeMark2 = null;
 
     var Editor = (function () {
         var self = {};
@@ -82,6 +85,10 @@ $(document).ready(function () {
         }
     }());
 
+    var targetMarker = null;
+    // var placeMark2 = null;
+
+
     // Monkey-patch L.Marker to support right-click events
     var originalFunction = L.Marker.prototype.on;
     L.Marker.prototype.on = function (ev, fn) {
@@ -93,32 +100,41 @@ $(document).ready(function () {
     /* Editor */
 
     var placementMode = false;
+
+    var setTarget = function (latlng) {
+        if (targetMarker) {
+            map.removeLayer(targetMarker);
+        }
+        targetMarker = new L.Marker(latlng, {draggable:true});
+        map.addLayer(targetMarker);
+        placementMode = false;
+//        targetMarker.on("dragend", function (e) {
+//
+//        });
+        targetMarker.on("dblclick", function (e) {
+            map.removeLayer(targetMarker);
+            targetMarker = null;
+        });
+        targetMarker.on("contextmenu", function () {
+
+        });
+    }
+
     map.on("click", function (e) {
         if (placementMode) {
-
-            if (placeMark) {
-                map.removeLayer(placeMark);
-            }
-            placeMark = new L.Marker(e.latlng, {draggable:true});
-            map.addLayer(placeMark);
+            setTarget(e.latlng);
             placementMode = false;
-            $("#placeButton").css({"background-color":"#ccc"});
-            placeMark.on("dragend", function (e) {
-                // console.log(placeMark);
-            });
-            placeMark.on("dblclick", function (e) {
-                console.log(placeMark);
-                //map.removeLayer(placeMark);
-            });
-            placeMark.on("contextmenu", function () {
-                alert("Hello rightclick!");
-            });
+            osmTooltip(null);
         }
     });
-    $("#placeButton").click(function () {
+    $("#placeButton").bind('click', function () {
+
         placementMode = !placementMode;
+
+
         if (placementMode) {
-            $("#placeButton").css("background-color", "#dd8");
+            if (targetMarker) map.removeLayer(targetMarker);
+            osmTooltip("Click or tap anywhere on the map to place a target marker");
         }
         else {
             $("#placeButton").css("background-color", "#ccc");
@@ -127,24 +143,26 @@ $(document).ready(function () {
     var dialogVisible = false;
 
 
-    $("#sendSms").click(function() {
+    $("#sendSms").bind('click', function () {
         var l = $("#dialog input.shortLink").val();
         var url = 'sms:SENDTO?body=' + encodeURIComponent(l);
         window.location = url;
         return false;
     });
 
-    $("#sendEmail").click(function() {
+    $("#sendEmail").bind('click', function () {
         var l = $("#dialog input.shortLink").val();
         var url = 'mailto:EMAIL?subject=Location&body=' + encodeURIComponent(l);
         window.location = url;
         return false;
     });
 
-    $("#generateLink").click(function () {
-        console.log(placeMark);
+    $("#generateLink").bind('click', function () {
+        console.log(targetMarker);
         $("#dialog").dialog({modal:true});
         $("#dialog").dialog('open');
+
+        $("#dialog a").eq(0).focus();
         var hostPart = window.location.toString().split("#")[0];
         hostPart = hostPart.substr(0, hostPart.lastIndexOf('/'));
 
@@ -156,8 +174,8 @@ $(document).ready(function () {
             zoom:mapZoom
         });
 
-        if (placeMark != undefined) {
-            var markerLatLng = placeMark.getLatLng();
+        if (targetMarker != undefined) {
+            var markerLatLng = targetMarker.getLatLng();
             link += "&" + putParams({marker:markerLatLng.lat + "," + markerLatLng.lng})
         }
 
