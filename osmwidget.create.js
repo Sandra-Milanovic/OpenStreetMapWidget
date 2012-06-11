@@ -160,7 +160,7 @@ $(document).ready(function () {
         $("#dialog").dialog({modal:true});
         $("#dialog").dialog('open');
 
-        $("#dialog a").eq(0).focus();
+        setTimeout(function() { $("#dialog a").focus(); }, 15);
         var hostPart = window.location.toString().split("#")[0];
         hostPart = hostPart.substr(0, hostPart.lastIndexOf('/'));
 
