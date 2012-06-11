@@ -1,0 +1,54 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+@media all and (max-width : 600px) {
+    body {
+        font-size: 12px;
+    }
+}
+
+@media all and (min-width : 601px) {
+    .mobileOnly {
+        display:none !important;
+    }
+    body {
+        font-size: 14px;
+    }
+}
+
+#toolbar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 80%;
+    text-align: right;
+}
+
+#toolbar input[type='button'] {
+    float: right;
+    background-color: #ccc;
+    color: #000;
+    border: solid 1px #999;
+}
+
+#introScreen a.button {
+    display: block;
+    width: 43%;
+    float: left;
+    margin: auto;
+}
+
+#introScreen div.explanation {
+    display: block;
+    width: 53%;
+    float: right;
+}
+
+#introScreen div.block {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    float: left;
+    clear: both;
+}

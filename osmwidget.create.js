@@ -29,8 +29,8 @@ $(document).ready(function () {
         autoOpen:false,
         bgIframe:true,
         title:"Embed map",
-        width:500,
-        height:400
+        width:Math.min(500, $(window).width() * 0.9),
+        height:Math.min(270, $(window).height() * 0.9)
     });
     $("#introScreen").dialog({
         modal:true,
@@ -49,23 +49,34 @@ $(document).ready(function () {
         maxZoom:18
     });
     map.addLayer(layer);
-    map.setView(new L.LatLng(41.99477, 21.42785), 8);
+    map.setView(new L.LatLng(41.99477, 21.42785), 5);
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            map.setView(
+                new L.LatLng(position.coords.latitude, position.coords.longitude),
+                14);
+        });
+    }
 
     var placeMark = null;
     // var placeMark2 = null;
 
-    var Editor = (function() {
+    var Editor = (function () {
         var self = {};
         self.defaultMode = {
-            init: function() {},
-            onClickMap: function() {},
+            init:function () {
+            },
+            onClickMap:function () {
+            }
         };
         self.targetMode = {
-            init: function() { }
+            init:function () {
+            }
 
         }
         self.currentMode = self.defaultMode;
-        self.setMode = function(m) {
+        self.setMode = function (m) {
             self.currentMode = m;
             m.init();
         }
@@ -73,58 +84,35 @@ $(document).ready(function () {
 
     // Monkey-patch L.Marker to support right-click events
     var originalFunction = L.Marker.prototype.on;
-    L.Marker.prototype.on = function(ev, fn) {
+    L.Marker.prototype.on = function (ev, fn) {
         if (ev == 'contextmenu') $(this._icon).bind('contextmenu', fn)
         else originalFunction.apply(this, arguments);
     };
 
-    /* Testing JS prototypes */
-    var MyConstructor = function() {
-        this._myVar = 5;
-    };
-
-    MyConstructor.prototype.myFunc = function() {
-        console.log(this._myVar);
-    }
-
-
-    MyConstructorO_prototype = {};
-    MyConstructorO_prototype.myFunc = function() {
-        console.log(this._myVar);
-    }
-    var MyConstructorO = function() {
-        var self = Object.create(MyConstructorO_prototype);
-        self._myVar = 5;
-        return self;
-    }
-
-
-    var myobj = new MyConstructor();
-    //myobj.myFunc();
-    var myobjo = MyConstructorO();
-    //myobjo.myFunc();
 
     /* Editor */
-    
+
     var placementMode = false;
-        map.on("click", function(e){    
+    map.on("click", function (e) {
         if (placementMode) {
-            
+
             if (placeMark) {
                 map.removeLayer(placeMark);
-                }
-                placeMark = new L.Marker(e.latlng, {draggable:true});
-                map.addLayer(placeMark);
-                placementMode = false;
-                $("#placeButton").css({"background-color": "#ccc"});
-                placeMark.on("dragend", function(e){
-                    // console.log(placeMark);
-                });
-                placeMark.on("dblclick", function(e){
-                    console.log(placeMark);
-                    //map.removeLayer(placeMark);
-                });
-                placeMark.on("contextmenu", function() { alert("Hello rightclick!"); });
+            }
+            placeMark = new L.Marker(e.latlng, {draggable:true});
+            map.addLayer(placeMark);
+            placementMode = false;
+            $("#placeButton").css({"background-color":"#ccc"});
+            placeMark.on("dragend", function (e) {
+                // console.log(placeMark);
+            });
+            placeMark.on("dblclick", function (e) {
+                console.log(placeMark);
+                //map.removeLayer(placeMark);
+            });
+            placeMark.on("contextmenu", function () {
+                alert("Hello rightclick!");
+            });
         }
     });
     $("#placeButton").click(function () {
@@ -137,6 +125,22 @@ $(document).ready(function () {
         }
     });
     var dialogVisible = false;
+
+
+    $("#sendSms").click(function() {
+        var l = $("#dialog input.shortLink").val();
+        var url = 'sms:SENDTO?body=' + encodeURIComponent(l);
+        window.location = url;
+        return false;
+    });
+
+    $("#sendEmail").click(function() {
+        var l = $("#dialog input.shortLink").val();
+        var url = 'mailto:EMAIL?subject=Location&body=' + encodeURIComponent(l);
+        window.location = url;
+        return false;
+    });
+
     $("#generateLink").click(function () {
         console.log(placeMark);
         $("#dialog").dialog({modal:true});
@@ -159,7 +163,7 @@ $(document).ready(function () {
 
         var embedIframe = ['<iframe src="', link, '" width="480" height="420"></iframe>'];
         $("#dialog a").attr("href", link);
-        $("#dialog textarea.link, #dialog input.shortLink").val(link);
+        $("#dialog input.shortLink").val(link);
         $("#dialog #iframe").val(embedIframe.join(""));
 
         getShortLink(link, function (short) {
