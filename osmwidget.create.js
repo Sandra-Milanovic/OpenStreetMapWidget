@@ -37,8 +37,8 @@ $(document).ready(function () {
         autoOpen:true,
         bgIframe:true,
         title:"Welcome to osmwidget",
-        width:640,
-        height:400
+        width:Math.min(640, $(window).width() * 0.9),
+        height:Math.min(480, $(window).height() * 0.9)
     });
     $("#map").width($(window).width());
     $("#map").height($(window).height());
