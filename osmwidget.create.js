@@ -143,14 +143,14 @@ $(document).ready(function () {
 
     $("#sendSms").bind('click', function () {
         var l = $("#dialog input.shortLink").val();
-        var url = 'sms:SENDTO?body=' + encodeURIComponent(l);
+        var url = 'sms:?body=' + encodeURIComponent(l);
         window.location = url;
         return false;
     });
 
     $("#sendEmail").bind('click', function () {
         var l = $("#dialog input.shortLink").val();
-        var url = 'mailto:EMAIL?subject=Location&body=' + encodeURIComponent(l);
+        var url = 'mailto:?subject=Location&body=' + encodeURIComponent(l);
         window.location = url;
         return false;
     });
