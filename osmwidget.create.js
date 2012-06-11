@@ -30,7 +30,6 @@ $(document).ready(function () {
         bgIframe:true,
         title:"Embed map",
         width:Math.min(500, $(window).width() * 0.9)
-        //height:Math.min(320, $(window).height() * 0.9)
     });
     $("#introScreen").dialog({
         modal:true,
@@ -38,7 +37,6 @@ $(document).ready(function () {
         bgIframe:true,
         title:"Welcome to osmwidget",
         width:Math.min(640, $(window).width() * 0.9)
-        //height:Math.min(480, $(window).height() * 0.9)
     });
 
     $("#openPlacemarkEditor").bind('click', function () {
