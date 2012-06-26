@@ -59,6 +59,7 @@ $(document).ready(function () {
     });
 
     osmTooltip(osmw.help.initialBeforeLocation);
+
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
             var latlng = new L.LatLng(position.coords.latitude, position.coords.longitude);
@@ -196,6 +197,5 @@ $(document).ready(function () {
         });
     });
 
-    osmTooltip(osmw.help.initial);
 
 });
