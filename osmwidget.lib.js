@@ -85,9 +85,10 @@ window.latLngCoder = (function (map) {
 window.osmw = {};
 
 window.osmw.help = {
-    "initial": 'Target placed at your present location. Click or tap on "Set Target" to change it.',
-    "beforeTarget":'Click or tap on "Set Target" to change the target location.',
-    "afterTarget":'Click or tap anywhere on the map to place a target marker'
+    "initial": 'Target placed at your location. "Set Target" to change it, "Share Map" to share it.',
+    "beforeTarget":'"Set Target" to change the target location.',
+    "afterTarget":'Click or tap anywhere on the map to set the target there',
+    "afterTargetPlaced":'"Share Map" to share this target, "Set Target" to change target'
 };
 
 window.switchLayer = (function() {

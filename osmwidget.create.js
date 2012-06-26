@@ -126,7 +126,7 @@ $(document).ready(function () {
         if (placementMode) {
             setTarget(e.latlng);
             placementMode = false;
-            osmTooltip(null);
+            osmTooltip(osmw.help.afterTargetPlaced);
         }
     });
     $("#placeButton").bind('click', function () {
