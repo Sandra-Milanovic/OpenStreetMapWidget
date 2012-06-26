@@ -142,11 +142,11 @@ $(document).ready(function () {
 
         if (placementMode) {
             if (targetMarker) map.removeLayer(targetMarker);
-            osmTooltip(window.osmw.afterTarget);
+            osmTooltip(osmw.help.afterTarget);
         }
         else {
             $("#placeButton").css("background-color", "#ccc");
-            osmTooltip(window.osmw.beforeTarget);
+            osmTooltip(osmw.help.beforeTarget);
         }
     });
     var dialogVisible = false;
