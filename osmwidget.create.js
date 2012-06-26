@@ -143,7 +143,7 @@ $(document).ready(function () {
 
     $("#sendSms").bind('click', function () {
         var l = $("#dialog input.shortLink").val();
-        var url = 'sms:?body=' + encodeURIComponent(l);
+        var url = 'sms:SENDTO?body=' + encodeURIComponent(l);
         window.location = url;
         return false;
     });
