@@ -51,19 +51,13 @@ $(document).ready(function () {
 
 
     var map = new L.Map('map');
-
-    var layer;
-    var switchLayer = function (l) {
-        if (layer) map.removeLayer(layer);
-        layer = new L.TileLayer(l.tiles, l.options);
-        map.addLayer(layer);
-    };
-    switchLayer(Layers.standard);
     map.setView(new L.LatLng(41.99477, 21.42785), 5);
 
+
+    switchLayer(map, Layers.standard);
     $("#mapLayer").change(function (e) {
         var whichLayer = $(this).val();
-        switchLayer(Layers[whichLayer]);
+        switchLayer(map, Layers[whichLayer]);
     });
 
 

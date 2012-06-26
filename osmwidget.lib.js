@@ -90,6 +90,21 @@ window.osmw.help = {
     "afterTarget":'Click or tap anywhere on the map to place a target marker'
 };
 
+window.switchLayer = (function() {
+    var layer;
+    return function (map, l) {
+        if (layer) map.removeLayer(layer);
+        layer = new L.TileLayer(l.tiles, l.options);
+        map.addLayer(layer);
+    };
+}());
+
+window.Convert = {
+    toDistance: function(d) {
+        return d.toFixed(2) + ' km';
+    }
+}
+
 osmTooltip = (function () {
 
     var tooltip = null;

@@ -18,21 +18,24 @@ $(document).ready(function () {
     var params = getParams();
     if ("marker" in params) {
         var markerArray = params.marker.split(","),
-                markerLat = markerArray[0],
-                markerLng = markerArray[1];
+            markerLat = markerArray[0],
+            markerLng = markerArray[1];
     }
+    $('.button').button();
 
-    $("#map").width($(window).width());
-    $("#map").height($(window).height());
-    var map = new L.Map('map');
-    var layer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution:'Copyright (C) OpenStreetMap.org',
-        maxZoom:18
+    $("#directions").click(function() {
+        $("#directionsPanel").toggle();
     });
     $("#map").width($(window).width());
     $("#map").height($(window).height());
-    map.addLayer(layer);
+    var map = new L.Map('map');
     map.setView(new L.LatLng(params.lat, params.lng), params.zoom);
+
+    switchLayer(map, Layers.standard);
+    $("#mapLayer").change(function (e) {
+        var whichLayer = $(this).val();
+        switchLayer(map, Layers[whichLayer]);
+    });
 
     var markerLocation = null;
     if ("marker" in params) {
@@ -62,7 +65,8 @@ $(document).ready(function () {
                     outFormat:'json',
                     routeType:'shortest', // make options for this
                     timeType:1, // options
-                    enhancedNarrative:false,
+                    enhancedNarrative:true,
+                    narrativeType:'microformat',
                     shapeFormat:'raw',
                     generalize:200,
                     locale:'en_GB',
@@ -73,6 +77,22 @@ $(document).ready(function () {
                     highwayEfficiency:21.0 // also not sure if options
                 }, function (response) {
                     console.log(response);
+                    $("#directionsPanel").html("");
+                    $("<table />").appendTo("#directionsPanel");
+                    response.route.legs[0].maneuvers.forEach(function (item) {
+                        var row = $('<tr />').addClass('point');
+                        $('<img />').attr('src', item.iconUrl).appendTo($('<td/>').appendTo(row));
+                        var textCell = $('<td />').addClass('text');
+                        textCell.html(item.narrative);
+
+                        textCell.appendTo(row);
+
+                        var distCell = $('<td />').addClass('distance');
+                        distCell.html(Convert.toDistance(item.distance))
+                        distCell.appendTo(row);
+
+                        row.appendTo($("#directionsPanel"));
+                    });
                     var latLngs = [], sp = response.route.shape.shapePoints;
                     for (var k = 0; k < sp.length; k += 2) {
                         latLngs.push(new L.LatLng(sp[k], sp[k + 1]));

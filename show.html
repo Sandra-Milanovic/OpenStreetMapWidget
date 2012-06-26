@@ -8,11 +8,23 @@
     <meta content="True" name="HandheldFriendly">
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
     <link rel="stylesheet" type="text/css" href="main.css">
+    <link rel="stylesheet"
+          href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/south-street/jquery-ui.css"/>
 </head>
 <body>
 <div id="map" style="height: 400px"></div>
-
+<div id="toolbar" style="z-index: 10;">
+    <select id="mapLayer" class="ui-combo ui-button ui-widget ui-state-default ui-corner-all">
+        <option value="standard">Standard</option>
+        <option value="cycle">Cycle map</option>
+        <option value="transport">Transport map</option>
+        <option value="mapquest">MapQuest open</option>
+    </select>
+    <a class="button" id="directions">Directions</a>
+</div>
+<div id="directionsPanel" class="ui-widget ui-dialog-content ui-widget-content"><table></table></div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
 <script src="http://code.leafletjs.com/leaflet-0.3.1/leaflet.js"></script>
 <script type="text/javascript" src="osmwidget.lib.js"></script>
 <script type="text/javascript" src=osmwidget.show.js></script>

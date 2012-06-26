@@ -60,3 +60,28 @@ div.tooltip {
     float: left;
     clear: both;
 }
+
+
+#directionsPanel {
+    display: none;
+    position:absolute;
+    top:0;
+    left:15%;
+    max-width: 70%;
+    max-height: 80%;
+    border-radius: 1em;
+    padding:1em;
+    overflow:auto;
+}
+
+#directionsPanel .point img {
+    margin-right:1em;
+    vertical-align: middle;
+}
+
+#directionsPanel .point td {
+    padding:0.25em 0.5em;
+}
+#directionsPanel .point  {
+    clear:both;
+}
