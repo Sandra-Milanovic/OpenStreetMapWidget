@@ -4,6 +4,11 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
+.ui-button.ui-combo  {
+    padding:0.4em 1em;
+    color:ButtonText;
+}
+
 div.tooltip {
     position: absolute;
     bottom:0.1em;

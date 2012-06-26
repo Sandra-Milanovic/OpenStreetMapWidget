@@ -1,3 +1,5 @@
+
+
 var putParams = function (obj) {
     var arrayStr = [];
     for (key in obj) {
@@ -19,9 +21,10 @@ var getShortLink = function (longURL, callback) {
 $(window).resize(function () {
     $("#map").width($(window).width());
     $("#map").height($(window).height());
-})
+});
 
 $(document).ready(function () {
+
 
     $('a.button').button();
 
@@ -46,13 +49,23 @@ $(document).ready(function () {
     $("#map").width($(window).width());
     $("#map").height($(window).height());
 
+
     var map = new L.Map('map');
-    var layer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution:'Copyright (C) OpenStreetMap.org',
-        maxZoom:18
-    });
-    map.addLayer(layer);
+
+    var layer;
+    var switchLayer = function (l) {
+        if (layer) map.removeLayer(layer);
+        layer = new L.TileLayer(l.tiles, l.options);
+        map.addLayer(layer);
+    };
+    switchLayer(Layers.standard);
     map.setView(new L.LatLng(41.99477, 21.42785), 5);
+
+    $("#mapLayer").change(function (e) {
+        var whichLayer = $(this).val();
+        switchLayer(Layers[whichLayer]);
+    });
+
 
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
@@ -106,9 +119,6 @@ $(document).ready(function () {
         targetMarker = new L.Marker(latlng, {draggable:true});
         map.addLayer(targetMarker);
         placementMode = false;
-//        targetMarker.on("dragend", function (e) {
-//
-//        });
         targetMarker.on("dblclick", function (e) {
             map.removeLayer(targetMarker);
             targetMarker = null;
@@ -160,7 +170,9 @@ $(document).ready(function () {
         $("#dialog").dialog({modal:true});
         $("#dialog").dialog('open');
 
-        setTimeout(function() { $("#dialog a").focus(); }, 15);
+        setTimeout(function () {
+            $("#dialog a").focus();
+        }, 15);
         var hostPart = window.location.toString().split("#")[0];
         hostPart = hostPart.substr(0, hostPart.lastIndexOf('/'));
 
@@ -187,4 +199,5 @@ $(document).ready(function () {
             $("#dialog input.shortLink").val(short);
         });
     });
+
 });

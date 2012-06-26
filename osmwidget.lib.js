@@ -6,6 +6,40 @@
  * To change this template use File | Settings | File Templates.
  */
 
+
+
+window.Layers = {
+    'standard':{
+        tiles:'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        options:{
+            attribution:'Copyright (C) OpenStreetMap.org',
+            maxZoom:18
+        }
+    },
+    'cycle':{
+        tiles:'http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png',
+        options:{
+            attribution:'Copyright (C) OpenCycleMap.org',
+            maxZoom:18
+        }
+    },
+    'transport':{
+        tiles:'http://{s}.tile2.opencyclemap.org/transport/{z}/{x}/{y}.png',
+        options:{
+            attribution:'Copyright (C) OpenStreetMap.org',
+            maxZoom:18
+        }
+    },
+    'mapquest':{
+        tiles:'http://otile{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png',
+        options:{
+            attribution:'Copyright (C) MapQuest',
+            maxZoom:18,
+            subdomains:['1', '2', '3']
+        }
+    }
+};
+
 window.latLngCoder = (function (map) {
     map = map ? map : "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-";
     var self = {};
