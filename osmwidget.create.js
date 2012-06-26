@@ -36,7 +36,7 @@ $(document).ready(function () {
     });
     $("#introScreen").dialog({
         modal:true,
-        autoOpen:true,
+        autoOpen:false,
         bgIframe:true,
         title:"Welcome to osmwidget",
         width:Math.min(640, $(window).width() * 0.9)
@@ -142,10 +142,11 @@ $(document).ready(function () {
 
         if (placementMode) {
             if (targetMarker) map.removeLayer(targetMarker);
-            osmTooltip("Click or tap anywhere on the map to place a target marker");
+            osmTooltip(window.osmw.afterTarget);
         }
         else {
             $("#placeButton").css("background-color", "#ccc");
+            osmTooltip(window.osmw.beforeTarget);
         }
     });
     var dialogVisible = false;
@@ -199,5 +200,7 @@ $(document).ready(function () {
             $("#dialog input.shortLink").val(short);
         });
     });
+
+    osmTooltip(osmw.help.initial);
 
 });

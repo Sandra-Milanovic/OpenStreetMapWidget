@@ -82,7 +82,13 @@ window.latLngCoder = (function (map) {
     return self;
 
 }());
+window.osmw = {};
 
+window.osmw.help = {
+    "initial": 'Target placed at your present location. Click or tap on "Set Target" to change it.',
+    "beforeTarget":'Click or tap on "Set Target" to change the target location.',
+    "afterTarget":'Click or tap anywhere on the map to place a target marker'
+};
 
 osmTooltip = (function () {
 
@@ -104,3 +110,5 @@ osmTooltip = (function () {
         }
     }
 }());
+
+
