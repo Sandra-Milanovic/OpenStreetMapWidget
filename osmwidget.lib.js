@@ -85,6 +85,8 @@ window.latLngCoder = (function (map) {
 window.osmw = {};
 
 window.osmw.help = {
+    "initialNoLocation":'Cannot find your location. Use "Set Target" to set the target location',
+    "initialBeforeLocation": 'Looking for your location. You can set the target using "Set Target" instead',
     "initial": 'Target placed at your location. "Set Target" to change it, "Share Map" to share it.',
     "beforeTarget":'"Set Target" to change the target location.',
     "afterTarget":'Click or tap anywhere on the map to set the target there',

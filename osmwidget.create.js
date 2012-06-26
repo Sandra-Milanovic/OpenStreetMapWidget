@@ -1,5 +1,3 @@
-
-
 var putParams = function (obj) {
     var arrayStr = [];
     for (key in obj) {
@@ -60,13 +58,16 @@ $(document).ready(function () {
         switchLayer(map, Layers[whichLayer]);
     });
 
-
+    osmTooltip(osmw.help.initialBeforeLocation);
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
             var latlng = new L.LatLng(position.coords.latitude, position.coords.longitude);
             setTarget(latlng);
             map.setView(latlng, 14);
+            osmTooltip(osmw.help.initial);
         });
+    } else {
+        osmTooltip(osmw.help.initialNoLocation);
     }
 
 
