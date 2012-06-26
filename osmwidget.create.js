@@ -148,7 +148,7 @@ $(document).ready(function () {
 
     $("#sendSms").bind('click', function () {
         var l = $("#dialog input.shortLink").val();
-        var url = 'sms:000?body=' + encodeURIComponent(l);
+        var url = 'sms:123456?body=' + encodeURIComponent(l);
         window.location = url;
         return false;
     });
