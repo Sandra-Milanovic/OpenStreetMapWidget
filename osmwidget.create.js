@@ -196,21 +196,34 @@ $(document).ready(function () {
         var mapPosition = map.getCenter();
         var mapZoom = map.getZoom();
         var link = hostPart + "/show.html?" + putParams({
-            lat:mapPosition.lat,
-            lng:mapPosition.lng,
+            lat:mapPosition.lat.toFixed(5),
+            lng:mapPosition.lng.toFixed(5),
             zoom:mapZoom,
             map:window.whichLayer
         });
 
         if (targetMarker != undefined) {
             var markerLatLng = targetMarker.getLatLng();
-            link += "&" + putParams({marker:markerLatLng.lat + "," + markerLatLng.lng})
+            link += "&" + putParams({marker:markerLatLng.lat.toFixed(5) + "," + markerLatLng.lng.toFixed(5)})
         }
 
-        var embedIframe = ['<iframe src="', link, '" width="480" height="420"></iframe>'];
         $("#dialog a").attr("href", link);
         $("#dialog input.shortLink").val(link);
-        $("#dialog #iframe").val(embedIframe.join(""));
+
+
+        var dim = {w:480, h:420};
+        dim.update = function() {
+            var embedIframe = ['<iframe src="', link, '" width="', dim.w, '" height="', dim.h, '"></iframe>'];
+            $("#dialog #iframe").val(embedIframe.join(""));
+        };
+        dim.update();
+
+        
+        $('.iframe-dimensions').change(function() {
+            dim[$(this).attr('name')] = $(this).val();
+            dim.update();
+        })
+        // in html: <input type="text" name="w" value="480" class="iframe-dimensions"> <input type="text" name="h" value="420" class="iframe-dimensions">
 
         getShortLink(link, function (short) {
             $("#dialog a.shortLink").attr('href', short);

@@ -85,3 +85,7 @@ div.tooltip {
 #directionsPanel .point  {
     clear:both;
 }
+
+input.iframe-dimensions {
+    width: 4em;
+}
