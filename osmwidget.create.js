@@ -1,3 +1,8 @@
+/**
+ * Creates URL parameters from an object
+ * @param obj the object
+ * @return the url string
+ */
 var putParams = function (obj) {
     var arrayStr = [];
     for (key in obj) {
@@ -5,6 +10,14 @@ var putParams = function (obj) {
     }
     return arrayStr.join("&");
 }
+
+// A link shortener function, using the bitly link shortening API
+
+/** 
+ * Shorten a link using bitly
+ * @param longURL the url to shorten
+ * @param callback callback(shortenedUrl) to call when done
+ */
 
 var getShortLink = function (longURL, callback) {
     $.get("https://api-ssl.bitly.com/v3/shorten", {
@@ -51,11 +64,12 @@ $(document).ready(function () {
     var map = new L.Map('map');
     map.setView(new L.LatLng(41.99477, 21.42785), 5);
 
-
     switchLayer(map, Layers.standard);
+    window.whichLayer = "standard";
     $("#mapLayer").change(function (e) {
-        var whichLayer = $(this).val();
+        window.whichLayer = $(this).val();
         switchLayer(map, Layers[whichLayer]);
+
     });
 
     osmTooltip(osmw.help.initialBeforeLocation);
@@ -131,6 +145,8 @@ $(document).ready(function () {
             osmTooltip(osmw.help.afterTargetPlaced);
         }
     });
+
+    // Place button and placement mode switcher
     $("#placeButton").bind('click', function () {
 
         placementMode = !placementMode;
@@ -147,7 +163,7 @@ $(document).ready(function () {
     });
     var dialogVisible = false;
 
-
+    // Send link by SMS. Recipient issue on some Android 2.3 phones 
     $("#sendSms").bind('click', function () {
         var l = $("#dialog input.shortLink").val();
         var url = 'sms:123456?body=' + encodeURIComponent(l);
@@ -155,6 +171,7 @@ $(document).ready(function () {
         return false;
     });
 
+    // Send link by email
     $("#sendEmail").bind('click', function () {
         var l = $("#dialog input.shortLink").val();
         var url = 'mailto:?subject=Location&body=' + encodeURIComponent(l);
@@ -162,6 +179,9 @@ $(document).ready(function () {
         return false;
     });
 
+    /* Generating the link with the map parameters.
+    setTimeout is used with the goal to change the focus from the textbox.
+    to prevent virtual keyboards from popping out */
     $("#generateLink").bind('click', function () {
         console.log(targetMarker);
         $("#dialog").dialog({modal:true});
@@ -178,7 +198,8 @@ $(document).ready(function () {
         var link = hostPart + "/show.html?" + putParams({
             lat:mapPosition.lat,
             lng:mapPosition.lng,
-            zoom:mapZoom
+            zoom:mapZoom,
+            map:window.whichLayer
         });
 
         if (targetMarker != undefined) {

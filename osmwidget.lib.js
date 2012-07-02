@@ -93,14 +93,17 @@ window.osmw.help = {
     "afterTargetPlaced":'"Share Map" to share this target, "Set Target" to change target'
 };
 
-window.switchLayer = (function() {
+(function() {
     var layer;
-    return function (map, l) {
+    window.switchLayer = function (map, l) {
         if (layer) map.removeLayer(layer);
         layer = new L.TileLayer(l.tiles, l.options);
         map.addLayer(layer);
     };
+
 }());
+
+
 
 window.Convert = {
     toDistance: function(d) {

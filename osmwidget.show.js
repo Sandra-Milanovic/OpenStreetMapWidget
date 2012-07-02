@@ -31,7 +31,8 @@ $(document).ready(function () {
     var map = new L.Map('map');
     map.setView(new L.LatLng(params.lat, params.lng), params.zoom);
 
-    switchLayer(map, Layers.standard);
+    switchLayer(map, Layers[params.map]);
+    $("#mapLayer").val(params.map);
     $("#mapLayer").change(function (e) {
         var whichLayer = $(this).val();
         switchLayer(map, Layers[whichLayer]);
