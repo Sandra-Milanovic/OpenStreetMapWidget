@@ -1,4 +1,4 @@
-//show.html?lat=lat&lngr=lng&zoom=zoom&marker=lat,lng
+//show.html?lat=lat&lngr=lng&zoom=zoom&target=lat,lng
 var getParams = function () {
     var params = {};
     var paramArray = window.location.search.substr(1).split("&");
@@ -16,8 +16,8 @@ $(window).resize(function () {
 
 $(document).ready(function () {
     var params = getParams();
-    if ("marker" in params) {
-        var markerArray = params.marker.split(","),
+    if ("target" in params) {
+        var markerArray = params.target.split(","),
             markerLat = markerArray[0],
             markerLng = markerArray[1];
     }
@@ -38,11 +38,19 @@ $(document).ready(function () {
         switchLayer(map, Layers[whichLayer]);
     });
 
-    var markerLocation = null;
-    if ("marker" in params) {
-        markerLocation = new L.LatLng(markerLat, markerLng);
-        var marker = new L.Marker(markerLocation);
-        map.addLayer(marker);
+    var tagetLocation = null;
+    if ("target" in params) {
+        var TargetIcon = L.Icon.extend({
+                        iconUrl:'home.png',
+                        iconSize:new L.Point(32, 38),
+                        iconAnchor:new L.Point(16, 38),
+                        popupAnchor:new L.Point(16, -48)
+                    });
+
+        tagetLocation = new L.LatLng(markerLat, markerLng);
+        var target = new L.Marker(tagetLocation);
+        target.setIcon(new TargetIcon('target.png'));
+        map.addLayer(target);
     }
 
 
@@ -60,7 +68,7 @@ $(document).ready(function () {
             });
             myMarker.setIcon(new CustomIcon('home.png'));
             map.addLayer(myMarker);
-            if (markerLocation && new Date().getTime() - lastRouteRequest > 60000) {
+            if (tagetLocation && new Date().getTime() - lastRouteRequest > 60000) {
 
                 $.getJSON('http://open.mapquestapi.com/directions/v0/route?callback=?', {
                     outFormat:'json',
@@ -73,7 +81,7 @@ $(document).ready(function () {
                     locale:'en_GB',
                     unit:'m',
                     from:[position.coords.latitude, position.coords.longitude].join(','),
-                    to:[markerLocation.lat, markerLocation.lng].join(','),
+                    to:[tagetLocation.lat, tagetLocation.lng].join(','),
                     drivingStyle:2, // not sure if options
                     highwayEfficiency:21.0 // also not sure if options
                 }, function (response) {

@@ -126,7 +126,16 @@ $(document).ready(function () {
         if (targetMarker) {
             map.removeLayer(targetMarker);
         }
+        
+        var TargetIcon = L.Icon.extend({
+                iconUrl:'home.png',
+                iconSize:new L.Point(32, 38),
+                iconAnchor:new L.Point(16, 38),
+                popupAnchor:new L.Point(16, -48)
+            });
+
         targetMarker = new L.Marker(latlng, {draggable:true});
+        targetMarker.setIcon(new TargetIcon('target.png'));
         map.addLayer(targetMarker);
         placementMode = false;
         targetMarker.on("dblclick", function (e) {
@@ -204,7 +213,7 @@ $(document).ready(function () {
 
         if (targetMarker != undefined) {
             var markerLatLng = targetMarker.getLatLng();
-            link += "&" + putParams({marker:markerLatLng.lat.toFixed(5) + "," + markerLatLng.lng.toFixed(5)})
+            link += "&" + putParams({target:markerLatLng.lat.toFixed(5) + "," + markerLatLng.lng.toFixed(5)})
         }
 
         $("#dialog a").attr("href", link);
@@ -219,7 +228,7 @@ $(document).ready(function () {
         dim.update();
 
         
-        $('.iframe-dimensions').change(function() {
+        $('input.iframe-dimensions').change(function() {
             dim[$(this).attr('name')] = $(this).val();
             dim.update();
         })
