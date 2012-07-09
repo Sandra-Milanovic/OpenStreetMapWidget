@@ -1,3 +1,12 @@
+.leaflet-marker-icon {
+    -moz-user-drag: none; 
+    -webkit-user-drag: none; 
+    user-drag: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
 body {
     margin: 0;
     padding: 0;

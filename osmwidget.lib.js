@@ -132,4 +132,31 @@ osmTooltip = (function () {
     }
 }());
 
-
+    // Monkey-patch L.Marker to support right-click events
+    var originalFunction = L.Marker.prototype.on;
+    L.Marker.prototype.on = function (ev, fn) {
+        var marker = this;
+        if (ev == 'contextmenu') $(this._icon).bind('contextmenu', function(e){
+            fn.call(marker, e)
+        });
+        else if (ev == 'longclick') {
+            var t;
+            $(this._icon).bind('mousedown touchstart', function(e) {
+                
+                if (!t) t = setTimeout(function() { 
+                    fn.call(marker, e); 
+                    t = null; 
+                    var posTop = $(marker._icon).position().top;
+                    $(marker._icon).animate({
+                        top: posTop - 15                        
+                    }, 100, 'linear', function() {
+                        $(marker._icon).animate({top: posTop}, 100, 'linear');
+                    });
+                }, 650);
+            })
+            $(this._icon).bind('mouseup touchend mouseout', function (){
+                if (t) { clearTimeout(t); t = null; }
+            });
+        }
+        else originalFunction.apply(this, arguments);
+    };

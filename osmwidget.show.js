@@ -38,7 +38,7 @@ $(document).ready(function () {
         switchLayer(map, Layers[whichLayer]);
     });
 
-    var tagetLocation = null;
+
     if ("target" in params) {
         var TargetIcon = L.Icon.extend({
                         iconUrl:'home.png',
@@ -51,6 +51,17 @@ $(document).ready(function () {
         var target = new L.Marker(tagetLocation);
         target.setIcon(new TargetIcon('target.png'));
         map.addLayer(target);
+
+        $(target._icon).on('dragstart', function(e) {
+            e.preventDefault();
+        });
+        target.on("longclick", function(e) {
+            this.dragging.enable();
+            this.dragging._draggable._onDown(e);
+        });
+        target.on("dragend", function() {
+            this.dragging.disable();
+        });
     }
 
 

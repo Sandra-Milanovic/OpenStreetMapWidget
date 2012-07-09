@@ -86,36 +86,31 @@ $(document).ready(function () {
     }
 
 
-    var Editor = (function () {
-        var self = {};
-        self.defaultMode = {
-            init:function () {
-            },
-            onClickMap:function () {
-            }
-        };
-        self.targetMode = {
-            init:function () {
-            }
+    // var Editor = (function () {
+    //     var self = {};
+    //     self.defaultMode = {
+    //         init:function () {
+    //         },
+    //         onClickMap:function () {
+    //         }
+    //     };
+    //     self.targetMode = {
+    //         init:function () {
+    //         }
 
-        }
-        self.currentMode = self.defaultMode;
-        self.setMode = function (m) {
-            self.currentMode = m;
-            m.init();
-        }
-    }());
+    //     }
+    //     self.currentMode = self.defaultMode;
+    //     self.setMode = function (m) {
+    //         self.currentMode = m;
+    //         m.init();
+    //     }
+    // }());
 
     var targetMarker = null;
     // var placeMark2 = null;
 
 
-    // Monkey-patch L.Marker to support right-click events
-    var originalFunction = L.Marker.prototype.on;
-    L.Marker.prototype.on = function (ev, fn) {
-        if (ev == 'contextmenu') $(this._icon).bind('contextmenu', fn)
-        else originalFunction.apply(this, arguments);
-    };
+
 
 
     /* Editor */
@@ -143,7 +138,7 @@ $(document).ready(function () {
             targetMarker = null;
         });
         targetMarker.on("contextmenu", function () {
-
+            console.log("RightClick");
         });
     }
 
