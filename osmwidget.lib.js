@@ -8,6 +8,66 @@
 
 
 
+
+window.menu = function (menu) {
+
+    return function (e) {
+        var menuDiv = $("<div />").addClass('menu').addClass('ui-widget-content');
+        // a transparent div sized full-screen
+        // that closes the menu when touched or pressed.
+        // This enables us to close the menu when we click/touch outside of it.
+        var closerDiv = $("<div />").addClass('menu-closer')
+            .css({width:$(window).width(), height:$(window).height()})
+            .bind('mousedown touchstart',function () {
+                menuDiv.remove();
+                closerDiv.remove();
+            }).appendTo('body');
+
+        // get the menu on top of everything
+        menuDiv.appendTo('body');
+        var lastItem;
+        for (var key in menu) {
+            lastItem = $("<div/>").addClass('item').appendTo(menuDiv)
+                .bind('click',function () {
+                    menuDiv.remove();
+                    closerDiv.remove();
+                    menu[key].apply(this, [e])
+                }).text(key);
+        }
+        lastItem.css({'border-bottom':'none'});
+
+        var isTouch = e && e.originalEvent && e.originalEvent.touches;
+
+        var menuPos;
+        if (isTouch) {
+            // position the menu on the middle of the screen
+            menuPos = {
+                left:($(window).width() - menuDiv.width()) / 2,
+                top:($(window).height() - menuDiv.height()) / 2
+            };
+
+        } else {
+            // position the menu at the clicking/touching point,
+            // but retract it if it goes off-screen.
+            menuPos = { left:e.pageX, top:e.pageY };
+            if (menuPos.left + menuDiv.width() > $(window).width())
+                menuPos.left = $(window).width() - menuDiv.width();
+            if (menuPos.top + menuDiv.height() > $(window).height())
+                menuPos.top = $(window).height() - menuDiv.height();
+        }
+        menuDiv.css(menuPos);
+
+        e.preventDefault();
+        e.stopPropagation();
+    };
+};
+
+//bla.on('contextmenu longclick', menu({
+//    "Delete": function(e) {  },
+//    "Reset": function(e) {  }
+//}));
+
+
 window.Layers = {
     'standard':{
         tiles:'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -86,14 +146,14 @@ window.osmw = {};
 
 window.osmw.help = {
     "initialNoLocation":'Cannot find your location. Use "Set Target" to set the target location',
-    "initialBeforeLocation": 'Looking for your location. You can set the target using "Set Target" instead',
-    "initial": 'Target placed at your location. "Set Target" to change it, "Share Map" to share it.',
+    "initialBeforeLocation":'Looking for your location. You can set the target using "Set Target" instead',
+    "initial":'Target placed at your location. "Set Target" to change it, "Share Map" to share it.',
     "beforeTarget":'"Set Target" to change the target location.',
     "afterTarget":'Click or tap anywhere on the map to set the target there',
     "afterTargetPlaced":'"Share Map" to share this target, "Set Target" to change target'
 };
 
-(function() {
+(function () {
     var layer;
     window.switchLayer = function (map, l) {
         if (layer) map.removeLayer(layer);
@@ -104,9 +164,8 @@ window.osmw.help = {
 }());
 
 
-
 window.Convert = {
-    toDistance: function(d) {
+    toDistance:function (d) {
         return d.toFixed(2) + ' km';
     }
 }
@@ -132,31 +191,48 @@ osmTooltip = (function () {
     }
 }());
 
-    // Monkey-patch L.Marker to support right-click and long click events
-    var originalFunction = L.Marker.prototype.on;
+var extractXY = function (event) {
+    var e = event && event.originalEvent && event.originalEvent.touches ?
+        event.originalEvent.touches[0] : event;
+    return {x:e.pageX, y:e.pageY};
+};
+
+// Monkey-patch L.Marker to support right-click and long click events
+(function () {
+    var originalMarkerOn = L.Marker.prototype.on;
     L.Marker.prototype.on = function (ev, fn) {
         var marker = this;
-        if (ev == 'contextmenu') $(this._icon).bind('contextmenu', function(e){
+        if (ev == 'contextmenu') $(this._icon).bind('contextmenu', function (e) {
             fn.call(marker, e)
         });
         else if (ev == 'longclick') {
-            var t;
-            $(this._icon).bind('mousedown touchstart', function(e) {
-                
-                if (!t) t = setTimeout(function() { 
-                    fn.call(marker, e); 
-                    t = null; 
-                    var posTop = $(marker._icon).position().top;
-                    $(marker._icon).animate({
-                        top: posTop - 15                        
-                    }, 100, 'linear', function() {
-                        $(marker._icon).animate({top: posTop}, 100, 'linear');
-                    });
-                }, 650);
-            })
-            $(this._icon).bind('mouseup touchend mouseout', function (){
-                if (t) { clearTimeout(t); t = null; }
+            var t, startPos;
+            $(this._icon).bind('mousedown touchstart', function (e) {
+
+                if (!t && e.button != 2) {
+                    startPos = extractXY(e);
+                    t = setTimeout(function () {
+                        fn.call(marker, e);
+                        t = null;
+                    }, 650);
+                }
+            });
+            $(this._icon).bind('mousemove touchmove', function (e) {
+                if (t && startPos) {
+                    var pos = extractXY(e);
+                    if (Math.abs(pos.x - startPos.x) + Math.abs(pos.y - startPos.y) > 15) {
+                        clearTimeout(t);
+                        t = null;
+                    }
+                }
+            });
+            $(this._icon).bind('mouseup touchend mouseout', function (e) {
+                if (t) {
+                    clearTimeout(t);
+                    t = null;
+                }
             });
         }
-        else originalFunction.apply(this, arguments);
+        else originalMarkerOn.apply(this, arguments);
     };
+}());

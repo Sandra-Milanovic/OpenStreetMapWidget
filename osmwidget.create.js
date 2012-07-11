@@ -13,7 +13,7 @@ var putParams = function (obj) {
 
 // A link shortener function, using the bitly link shortening API
 
-/** 
+/**
  * Shorten a link using bitly
  * @param longURL the url to shorten
  * @param callback callback(shortenedUrl) to call when done
@@ -110,9 +110,6 @@ $(document).ready(function () {
     // var placeMark2 = null;
 
 
-
-
-
     /* Editor */
 
     var placementMode = false;
@@ -121,13 +118,13 @@ $(document).ready(function () {
         if (targetMarker) {
             map.removeLayer(targetMarker);
         }
-        
+
         var TargetIcon = L.Icon.extend({
-                iconUrl:'home.png',
-                iconSize:new L.Point(32, 38),
-                iconAnchor:new L.Point(16, 38),
-                popupAnchor:new L.Point(16, -48)
-            });
+            iconUrl:'home.png',
+            iconSize:new L.Point(32, 38),
+            iconAnchor:new L.Point(16, 38),
+            popupAnchor:new L.Point(16, -48)
+        });
 
         targetMarker = new L.Marker(latlng, {draggable:true});
         targetMarker.setIcon(new TargetIcon('target.png'));
@@ -137,10 +134,17 @@ $(document).ready(function () {
             map.removeLayer(targetMarker);
             targetMarker = null;
         });
-        targetMarker.on("contextmenu", function () {
-            console.log("RightClick");
+        var targetMenu = menu({
+            "Hello":function () {
+                alert("Hi");
+            },
+            "Good bye":function () {
+                alert("Bye bye");
+            }
         });
-    }
+        targetMarker.on("contextmenu", targetMenu);
+        targetMarker.on("longclick", targetMenu);
+    };
 
     map.on("click", function (e) {
         if (placementMode) {
@@ -184,8 +188,8 @@ $(document).ready(function () {
     });
 
     /* Generating the link with the map parameters.
-    setTimeout is used with the goal to change the focus from the textbox.
-    to prevent virtual keyboards from popping out */
+     setTimeout is used with the goal to change the focus from the textbox.
+     to prevent virtual keyboards from popping out */
     $("#generateLink").bind('click', function () {
         console.log(targetMarker);
         $("#dialog").dialog({modal:true});
@@ -216,17 +220,18 @@ $(document).ready(function () {
 
 
         var dim = {w:480, h:420};
-        dim.update = function() {
+        dim.update = function () {
             var embedIframe = ['<iframe src="', link, '" width="', dim.w, '" height="', dim.h, '"></iframe>'];
             $("#dialog #iframe").val(embedIframe.join(""));
         };
         dim.update();
 
-        
-        $('input.iframe-dimensions').change(function() {
+
+        $('input.iframe-dimensions').change(function () {
             dim[$(this).attr('name')] = $(this).val();
             dim.update();
-        })
+        });
+
         // in html: <input type="text" name="w" value="480" class="iframe-dimensions"> <input type="text" name="h" value="420" class="iframe-dimensions">
 
         getShortLink(link, function (short) {
