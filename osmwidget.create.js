@@ -35,6 +35,7 @@ $(window).resize(function () {
 });
 
 $(document).ready(function () {
+    //debug();
 
 
     $('a.button').button();
@@ -241,5 +242,5 @@ $(document).ready(function () {
     });
 
 
-    //debug();
+
 });

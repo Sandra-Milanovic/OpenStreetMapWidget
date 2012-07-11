@@ -12,6 +12,9 @@
 window.menu = function (menu) {
 
     return function (e) {
+        console.log(e);
+        var isTouch = e && e.originalEvent && e.originalEvent.touches;
+
         var menuDiv = $("<div />").addClass('menu').addClass('ui-widget-content');
         // a transparent div sized full-screen
         // that closes the menu when touched or pressed.
@@ -22,7 +25,7 @@ window.menu = function (menu) {
                 menuDiv.remove();
                 closerDiv.remove();
             }).appendTo('body');
-
+        if (isTouch) closerDiv.css({'background-color':'rgba(0,0,0,0.33)'});
         // get the menu on top of everything
         menuDiv.appendTo('body');
         var lastItem;
@@ -36,7 +39,6 @@ window.menu = function (menu) {
         }
         lastItem.css({'border-bottom':'none'});
 
-        var isTouch = e && e.originalEvent && e.originalEvent.touches;
 
         var menuPos;
         if (isTouch) {
@@ -245,19 +247,19 @@ var extractXY = function (event) {
 var debug = function () {
     if (!window.debugUrl) window.debugUrl = 'http://192.168.88.158:8001';
     (function (e) {
-        e.addEventListener('load', function () {
-            setTimeout(function () {
-                if (window.console && window.console.log) {
-                    var oldlog = window.console.log;
-                    window.console.log = function () {
-                        if (arguments.length > 0)
-                            if (typeof(arguments[0]) == "null")
-                                arguments[0] = "null";
-                        oldlog.apply(this, arguments);
-                    };
-                }
-            }, 1000);
-        });
+//        e.addEventListener('load', function () {
+//            setTimeout(function () {
+//                if (window.console && window.console.log) {
+//                    var oldlog = window.console.log;
+//                    window.console.log = function () {
+//                        if (arguments.length > 0)
+//                            if (typeof(arguments[0]) == "null")
+//                                arguments[0] = "null";
+//                        oldlog.apply(this, arguments);
+//                    };
+//                }
+//            }, 1000);
+//        });
         e.setAttribute("src", window.debugUrl + "/target/target-script-min.js#anonymous");
         document.getElementsByTagName("body")[0].appendChild(e);
     })(document.createElement("script"));
