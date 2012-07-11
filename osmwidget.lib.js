@@ -132,7 +132,7 @@ osmTooltip = (function () {
     }
 }());
 
-    // Monkey-patch L.Marker to support right-click events
+    // Monkey-patch L.Marker to support right-click and long click events
     var originalFunction = L.Marker.prototype.on;
     L.Marker.prototype.on = function (ev, fn) {
         var marker = this;

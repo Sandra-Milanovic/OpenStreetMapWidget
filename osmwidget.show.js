@@ -26,8 +26,8 @@ $(document).ready(function () {
     $("#directions").click(function() {
         $("#directionsPanel").toggle();
     });
-    $("#map").width($(window).width());
-    $("#map").height($(window).height());
+    $("#map").width($(window).width())
+;    $("#map").height($(window).height());
     var map = new L.Map('map');
     map.setView(new L.LatLng(params.lat, params.lng), params.zoom);
 
@@ -48,20 +48,9 @@ $(document).ready(function () {
                     });
 
         tagetLocation = new L.LatLng(markerLat, markerLng);
-        var target = new L.Marker(tagetLocation);
+        var target = new L.Marker(tagetLocation, {draggable: true});
         target.setIcon(new TargetIcon('target.png'));
         map.addLayer(target);
-
-        $(target._icon).on('dragstart', function(e) {
-            e.preventDefault();
-        });
-        target.on("longclick", function(e) {
-            this.dragging.enable();
-            this.dragging._draggable._onDown(e);
-        });
-        target.on("dragend", function() {
-            this.dragging.disable();
-        });
     }
 
 
