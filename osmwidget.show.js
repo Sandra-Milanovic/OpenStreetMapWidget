@@ -59,14 +59,14 @@ $(document).ready(function () {
     if (navigator.geolocation) {
         navigator.geolocation.watchPosition(function (position) {
             if (myMarker) map.removeLayer(myMarker);
-            myMarker = new L.Marker(new L.LatLng(position.coords.latitude, position.coords.longitude))
+            myMarker = new L.Marker(new L.LatLng(position.coords.latitude, position.coords.longitude), {draggable: true})
             var CustomIcon = L.Icon.extend({
                 iconUrl:'home.png',
                 iconSize:new L.Point(32, 38),
                 iconAnchor:new L.Point(16, 38),
                 popupAnchor:new L.Point(16, -48)
             });
-            myMarker.setIcon(new CustomIcon('home.png'), {draggable: true});
+            myMarker.setIcon(new CustomIcon('home.png'));
             map.addLayer(myMarker);
             if (tagetLocation && new Date().getTime() - lastRouteRequest > 60000) {
 
