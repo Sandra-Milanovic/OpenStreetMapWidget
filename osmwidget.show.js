@@ -66,7 +66,7 @@ $(document).ready(function () {
                 iconAnchor:new L.Point(16, 38),
                 popupAnchor:new L.Point(16, -48)
             });
-            myMarker.setIcon(new CustomIcon('home.png'));
+            myMarker.setIcon(new CustomIcon('home.png'), {draggable: true});
             map.addLayer(myMarker);
             if (tagetLocation && new Date().getTime() - lastRouteRequest > 60000) {
 
