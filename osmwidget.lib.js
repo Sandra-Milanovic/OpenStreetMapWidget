@@ -236,3 +236,29 @@ var extractXY = function (event) {
         else originalMarkerOn.apply(this, arguments);
     };
 }());
+
+
+// Support for Weinre for mobile phones in a desktop browser
+// Weinre provides a remote javascript console and dom/network/resource
+// inspectors (i.e. most of the chrome developer tools)
+
+var debug = function () {
+    if (!window.debugUrl) window.debugUrl = 'http://192.168.88.158:8001';
+    (function (e) {
+        e.addEventListener('load', function () {
+            setTimeout(function () {
+                if (window.console && window.console.log) {
+                    var oldlog = window.console.log;
+                    window.console.log = function () {
+                        if (arguments.length > 0)
+                            if (typeof(arguments[0]) == "null")
+                                arguments[0] = "null";
+                        oldlog.apply(this, arguments);
+                    };
+                }
+            }, 1000);
+        });
+        e.setAttribute("src", window.debugUrl + "/target/target-script-min.js#anonymous");
+        document.getElementsByTagName("body")[0].appendChild(e);
+    })(document.createElement("script"));
+};
