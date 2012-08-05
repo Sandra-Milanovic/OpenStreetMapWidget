@@ -150,13 +150,14 @@ $(document).ready(function () {
     var createPlacemark = function (latlng, opt) {
         opt = $.extend({
             icon:'home.png',
-            text:"Placemark description"
+            text:""
         }, opt);
         var m = new L.Marker(latlng, {draggable:true});
         map.addLayer(m);
         m.setIcon(new MarkerIcon({iconUrl:opt.icon}));
         var pmMenu = menu({
             "Remove placemark":function () {
+                placemarks.splice(placemarks.indexOf(m), 1);
                 map.removeLayer(m);
             },
             "Edit info":function () {
@@ -165,7 +166,9 @@ $(document).ready(function () {
         });
         m.on('contextmenu', pmMenu);
         m.on('longclick', pmMenu);
-        m.description = opt.description;
+
+        m.icon = opt.icon;
+        m.text = opt.text;
 
         placemarks.push(m);
         return m;
@@ -237,11 +240,18 @@ $(document).ready(function () {
 
         var mapPosition = map.getCenter();
         var mapZoom = map.getZoom();
+
+        var x = new L.Marker();
+        var pmString = placemarks.map(function (pm) {
+            return latLngCoder.encode(pm.getLatLng()) + ";" + pm.icon + ";" + pm.text;
+        }).join(",");
+
         var link = hostPart + "/show.html?" + putParams({
             lat:mapPosition.lat.toFixed(5),
             lng:mapPosition.lng.toFixed(5),
             zoom:mapZoom,
-            map:window.whichLayer
+            map:window.whichLayer,
+            places: pmString
         });
 
         if (targetMarker != undefined) {

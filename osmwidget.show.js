@@ -15,7 +15,15 @@ $(window).resize(function () {
 })
 
 $(document).ready(function () {
+    var MarkerIcon = L.Icon.extend({
+        iconUrl:'home.png',
+        iconSize:new L.Point(32, 38),
+        iconAnchor:new L.Point(16, 38),
+        popupAnchor:new L.Point(16, -48)
+    });
+
     var params = getParams();
+
     if ("target" in params) {
         var markerArray = params.target.split(","),
             markerLat = markerArray[0],
@@ -39,12 +47,7 @@ $(document).ready(function () {
         switchLayer(map, Layers[whichLayer]);
     });
 
-    var MarkerIcon = L.Icon.extend({
-        iconUrl:'home.png',
-        iconSize:new L.Point(32, 38),
-        iconAnchor:new L.Point(16, 38),
-        popupAnchor:new L.Point(16, -48)
-    });
+
     if ("target" in params) {
 
 
@@ -54,6 +57,18 @@ $(document).ready(function () {
         map.addLayer(target);
     }
 
+    if ("places" in params) {
+        params.places.split(",").forEach(function (pStr) {
+            var pArr = pStr.split(';');
+            var ll = latLngCoder.decode(pArr[0]);
+            var iconUrl = pArr[1];
+            var text = pArr[2];
+            var place = new L.Marker(new L.LatLng(ll.lat, ll.lng), {draggable:false});
+            place.setIcon(new MarkerIcon({iconUrl:iconUrl}));
+            place.bindPopup(text);
+            map.addLayer(place);
+        })
+    }
 
     var myMarker = null, lastRouteRequest = 0, lastPoly;
     // Request repeated updates.
