@@ -1,3 +1,22 @@
+#editPlacemark .icons .icon {
+    height: 32px;
+    margin: 5px;
+    vertical-align: middle;
+    width: 150px;
+    padding-left:40px;
+    background-repeat: no-repeat;
+    background-position: left center;
+    float:left;
+}
+#editPlacemark .icons {
+    height: 15em;
+    overflow:auto;
+}
+
+#editPlacemark .icons .icon.active {
+    background-color:#e5e3c9;
+}
+
 .leaflet-marker-icon {
     -moz-user-drag: none; 
     -webkit-user-drag: none; 

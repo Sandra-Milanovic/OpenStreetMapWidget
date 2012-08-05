@@ -16,7 +16,7 @@ $(window).resize(function () {
 
 $(document).ready(function () {
     var MarkerIcon = L.Icon.extend({
-        iconUrl:'home.png',
+        iconUrl:icons.urlPrefix + 'home.png',
         iconSize:new L.Point(32, 38),
         iconAnchor:new L.Point(16, 38),
         popupAnchor:new L.Point(16, -48)
@@ -53,7 +53,7 @@ $(document).ready(function () {
 
         tagetLocation = new L.LatLng(markerLat, markerLng);
         var target = new L.Marker(tagetLocation, {draggable:true});
-        target.setIcon(new MarkerIcon({iconUrl:'target.png'}));
+        target.setIcon(new MarkerIcon({iconUrl:icons.urlPrefix + 'regroup.png'}));
         map.addLayer(target);
     }
 
@@ -62,9 +62,9 @@ $(document).ready(function () {
             var pArr = pStr.split(';');
             var ll = latLngCoder.decode(pArr[0]);
             var iconUrl = pArr[1];
-            var text = pArr[2];
+            var text = decodeURIComponent(pArr[2]);
             var place = new L.Marker(new L.LatLng(ll.lat, ll.lng), {draggable:false});
-            place.setIcon(new MarkerIcon({iconUrl:iconUrl}));
+            place.setIcon(new MarkerIcon({iconUrl:icons.urlPrefix + iconUrl}));
             place.bindPopup(text);
             map.addLayer(place);
         })
@@ -76,7 +76,7 @@ $(document).ready(function () {
         navigator.geolocation.watchPosition(function (position) {
             if (myMarker) map.removeLayer(myMarker);
             myMarker = new L.Marker(new L.LatLng(position.coords.latitude, position.coords.longitude), {draggable:true})
-            myMarker.setIcon(new MarkerIcon({iconUrl:'home.png'}));
+            myMarker.setIcon(new MarkerIcon({iconUrl:icons.urlPrefix + 'home.png'}));
             map.addLayer(myMarker);
             if (tagetLocation && new Date().getTime() - lastRouteRequest > 60000) {
 

@@ -15,32 +15,11 @@
 </head>
 <body>
 <div id="map" style="height: 400px"></div>
-<div id="introScreen" style="display:none;">
-    <div class="block">
-        <a href="#" id="openPlacemarkEditor" class="button">Create a placemark map</a>
 
-        <div class="explanation">
-            Create a map with a single place marked on
-            the map. When someone opens the map, they will
-            be shown the place and its description and they will
-            get directions on how to arrive to the place from
-            location
-        </div>
-    </div>
-    <div class="block">
-        <a href="#" id="openRouteEditor" class="button">Create a route map</a>
-
-        <div class="explanation">
-            Create a map which displays a fixed, pre-defined route and multiple placemarks (optional)
-        </div>
-    </div>
-    <div class="block">
-        <a href="#" id="openAdvancedEditor" class="button">Create an advanced map</a>
-
-        <div class="explanation">
-            Create a map which contains multiple placemarks, routes and other shapes
-        </div>
-    </div>
+<div id="editPlacemark" style="display:none;">
+    Description: <input type="text" class="text" value=""><br><br>
+    <input type="hidden" class="iconval">
+    <div class="icons"></div>
 </div>
 
 <div id="dialog" style="display:none;">
