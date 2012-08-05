@@ -179,12 +179,14 @@ $(document).ready(function () {
         }
     });
 
-
-    map.on("contextmenu", menu({
+    var mapContextMenu = menu({
         "Add placemark":function (e) {
             createPlacemark(e.latlng);
         }
-    }));
+    });
+
+    mapLongPress(map, mapContextMenu);
+    map.on("contextmenu", mapContextMenu);
 
     // Place button and placement mode switcher
     $("#placeButton").bind('click', function () {

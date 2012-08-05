@@ -7,13 +7,34 @@
  */
 
 
+var debug = function () {
+    if (!window.debugUrl) window.debugUrl = 'http://192.168.1.116:8080';
+    (function (e) {
+        e.addEventListener('load', function () {
+            setTimeout(function () {
+                if (window.console && window.console.log) {
+                    var oldlog = window.console.log;
+                    window.console.log = function () {
+                        if (arguments.length > 0)
+                            if (typeof(arguments[0]) == "null")
+                                arguments[0] = "null";
+                        oldlog.apply(this, arguments);
+                    };
+                }
+            }, 1000);
+        });
+        e.setAttribute("src", window.debugUrl + "/target/target-script-min.js#anonymous");
+        document.getElementsByTagName("body")[0].appendChild(e);
+    })(document.createElement("script"));
+};
 
+//debug();
 
 window.menu = function (menu) {
 
     return function (e) {
+        if ($('body > .menu-closer').length) return;
         console.log(e);
-        var isTouch = e && e.originalEvent && e.originalEvent.touches;
 
         var menuDiv = $("<div />").addClass('menu').addClass('ui-widget-content');
         // a transparent div sized full-screen
@@ -25,7 +46,7 @@ window.menu = function (menu) {
                 menuDiv.remove();
                 closerDiv.remove();
             }).appendTo('body');
-        if (isTouch) closerDiv.css({'background-color':'rgba(0,0,0,0.33)'});
+        if (L.Browser.touch) closerDiv.css({'background-color':'rgba(0,0,0,0.33)'});
         // get the menu on top of everything
         menuDiv.appendTo('body');
         var lastItem;
@@ -43,7 +64,7 @@ window.menu = function (menu) {
 
 
         var menuPos;
-        if (isTouch) {
+        if (L.Browser.touch) {
             // position the menu on the middle of the screen
             menuPos = {
                 left:($(window).width() - menuDiv.width()) / 2,
@@ -205,7 +226,43 @@ var extractXY = function (event) {
 };
 
 // Monkey-patch L.Marker to support right-click and long click events
+// Also monkey-patch L.Map to support longclick
+
 (function () {
+
+
+    window.mapLongPress = function (map, fn) {
+        var t, startPos;
+        map.on('mousedown', function (e) {
+            if (!t && e.originalEvent.button != 2) {
+                startPos = e.containerPoint;
+                t = setTimeout(function () {
+                    fn.call(map, e);
+                    t = null;
+                }, 650);
+            }
+        });
+        map.on('mousemove', function (e) {
+            console.log
+            if (t && startPos) {
+                var pos = e.containerPoint;
+                if (Math.abs(pos.x - startPos.x) + Math.abs(pos.y - startPos.y) > 15) {
+                    clearTimeout(t);
+                    t = null;
+                }
+            }
+        });
+        var upOut = function (e) {
+            if (t) {
+                clearTimeout(t);
+                t = null;
+            }
+        };
+        map.on('mouseup', upOut);
+        //$(map).on('mouseout', upOut);
+    };
+
+
     var originalMarkerOn = L.Marker.prototype.on;
     L.Marker.prototype.on = function (ev, fn) {
         var marker = this;
@@ -249,23 +306,3 @@ var extractXY = function (event) {
 // Weinre provides a remote javascript console and dom/network/resource
 // inspectors (i.e. most of the chrome developer tools)
 
-var debug = function () {
-    if (!window.debugUrl) window.debugUrl = 'http://192.168.88.158:8001';
-    (function (e) {
-//        e.addEventListener('load', function () {
-//            setTimeout(function () {
-//                if (window.console && window.console.log) {
-//                    var oldlog = window.console.log;
-//                    window.console.log = function () {
-//                        if (arguments.length > 0)
-//                            if (typeof(arguments[0]) == "null")
-//                                arguments[0] = "null";
-//                        oldlog.apply(this, arguments);
-//                    };
-//                }
-//            }, 1000);
-//        });
-        e.setAttribute("src", window.debugUrl + "/target/target-script-min.js#anonymous");
-        document.getElementsByTagName("body")[0].appendChild(e);
-    })(document.createElement("script"));
-};
