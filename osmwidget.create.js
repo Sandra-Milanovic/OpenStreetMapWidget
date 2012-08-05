@@ -115,20 +115,21 @@ $(document).ready(function () {
 
     var placementMode = false;
 
+
+    var MarkerIcon = L.Icon.extend({
+        iconUrl:'home.png',
+        iconSize:new L.Point(32, 38),
+        iconAnchor:new L.Point(16, 38),
+        popupAnchor:new L.Point(16, -48)
+    });
+
+
     var setTarget = function (latlng) {
         if (targetMarker) {
             map.removeLayer(targetMarker);
         }
-
-        var TargetIcon = L.Icon.extend({
-            iconUrl:'home.png',
-            iconSize:new L.Point(32, 38),
-            iconAnchor:new L.Point(16, 38),
-            popupAnchor:new L.Point(16, -48)
-        });
-
         targetMarker = new L.Marker(latlng, {draggable:true});
-        targetMarker.setIcon(new TargetIcon('target.png'));
+        targetMarker.setIcon(new MarkerIcon({iconUrl:'target.png'}));
         map.addLayer(targetMarker);
         placementMode = false;
         targetMarker.on("dblclick", function (e) {
@@ -136,15 +137,38 @@ $(document).ready(function () {
             targetMarker = null;
         });
         var targetMenu = menu({
-            "Hello":function () {
-                alert("Hi");
-            },
-            "Good bye":function () {
-                alert("Bye bye");
+            "Edit info":function () {
+                alert("TODO: edit description and icon")
             }
         });
         targetMarker.on("contextmenu", targetMenu);
         targetMarker.on("longclick", targetMenu);
+
+    };
+
+    var placemarks = [];
+    var createPlacemark = function (latlng, opt) {
+        opt = $.extend({
+            icon:'home.png',
+            text:"Placemark description"
+        }, opt);
+        var m = new L.Marker(latlng, {draggable:true});
+        map.addLayer(m);
+        m.setIcon(new MarkerIcon({iconUrl:opt.icon}));
+        var pmMenu = menu({
+            "Remove placemark":function () {
+                map.removeLayer(m);
+            },
+            "Edit info":function () {
+                alert("TODO: open dialog to edit description and icon");
+            }
+        });
+        m.on('contextmenu', pmMenu);
+        m.on('longclick', pmMenu);
+        m.description = opt.description;
+
+        placemarks.push(m);
+        return m;
     };
 
     map.on("click", function (e) {
@@ -154,6 +178,13 @@ $(document).ready(function () {
             osmTooltip(osmw.help.afterTargetPlaced);
         }
     });
+
+
+    map.on("contextmenu", menu({
+        "Add placemark":function (e) {
+            createPlacemark(e.latlng);
+        }
+    }));
 
     // Place button and placement mode switcher
     $("#placeButton").bind('click', function () {
@@ -240,7 +271,6 @@ $(document).ready(function () {
             $("#dialog input.shortLink").val(short);
         });
     });
-
 
 
 });

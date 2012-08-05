@@ -30,12 +30,14 @@ window.menu = function (menu) {
         menuDiv.appendTo('body');
         var lastItem;
         for (var key in menu) {
-            lastItem = $("<div/>").addClass('item').appendTo(menuDiv)
-                .bind('click',function () {
-                    menuDiv.remove();
-                    closerDiv.remove();
-                    menu[key].apply(this, [e])
-                }).text(key);
+            (function (key) {
+                lastItem = $("<div/>").addClass('item').appendTo(menuDiv)
+                    .bind('click',function () {
+                        menuDiv.remove();
+                        closerDiv.remove();
+                        menu[key].apply(this, [e])
+                    }).text(key);
+            }(key));
         }
         lastItem.css({'border-bottom':'none'});
 
@@ -51,7 +53,11 @@ window.menu = function (menu) {
         } else {
             // position the menu at the clicking/touching point,
             // but retract it if it goes off-screen.
-            menuPos = { left:e.pageX, top:e.pageY };
+
+            // leaflet events
+            if (e.containerPoint) menuPos = {left:e.containerPoint.x, top:e.containerPoint.y};
+            // normal events
+            else menuPos = { left:e.pageX, top:e.pageY };
             if (menuPos.left + menuDiv.width() > $(window).width())
                 menuPos.left = $(window).width() - menuDiv.width();
             if (menuPos.top + menuDiv.height() > $(window).height())
@@ -59,8 +65,8 @@ window.menu = function (menu) {
         }
         menuDiv.css(menuPos);
 
-        e.preventDefault();
-        e.stopPropagation();
+        if (e.preventDefault) e.preventDefault();
+        if (e.stopPropagation) e.stopPropagation();
     };
 };
 
@@ -147,7 +153,7 @@ window.latLngCoder = (function (map) {
 window.osmw = {};
 
 window.osmw.help = {
-    "initialNoLocation":'Cannot find your location. Use "Set Target" to set the target location',
+    "initialNoLocation":'Cannot find your location and use it as a target. Use "Set Target" to set the target location',
     "initialBeforeLocation":'Looking for your location. You can set the target using "Set Target" instead',
     "initial":'Target placed at your location. "Set Target" to change it, "Share Map" to share it.',
     "beforeTarget":'"Set Target" to change the target location.',
@@ -162,7 +168,6 @@ window.osmw.help = {
         layer = new L.TileLayer(l.tiles, l.options);
         map.addLayer(layer);
     };
-
 }());
 
 
@@ -170,7 +175,7 @@ window.Convert = {
     toDistance:function (d) {
         return d.toFixed(2) + ' km';
     }
-}
+};
 
 osmTooltip = (function () {
 
