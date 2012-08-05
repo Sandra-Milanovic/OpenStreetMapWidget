@@ -83,9 +83,44 @@ $(document).ready(function () {
                 pm.text = $("#editPlacemark .text").val();
                 pm.icon = $("#editPlacemark .iconval").val();
                 pm.setIcon(new MarkerIcon({iconUrl:icons.urlPrefix + pm.icon}));
+                pm.on('contextmenu', pm.pmMenu);
+                pm.on('longclick', pm.pmMenu);
                 $("#editPlacemark").dialog('close');
             }
         });
+    };
+
+    var placemarks = [];
+    var createPlacemark = function (latlng, opt) {
+        opt = $.extend({
+            icon:'places-unvisited.png',
+            text:""
+        }, opt);
+        var m = new L.Marker(latlng, {draggable:true});
+        map.addLayer(m);
+        m.setIcon(new MarkerIcon({iconUrl:icons.urlPrefix + opt.icon}));
+        m.pmMenu = menu({
+            "Remove placemark":function () {
+                placemarks.splice(placemarks.indexOf(m), 1);
+                map.removeLayer(m);
+            },
+            "Edit info":function () {
+                editPlacemark(m);
+            }
+        });
+        m.on('contextmenu', m.pmMenu);
+        m.on('longclick', m.pmMenu);
+        m.on('dblclick', function() {
+            placemarks.splice(placemarks.indexOf(m), 1);
+            map.removeLayer(m);            
+        });
+
+        m.icon = opt.icon;
+        m.text = opt.text;
+
+        placemarks.push(m);
+        editPlacemark(m);
+        return m;
     };
 
 
@@ -156,34 +191,7 @@ $(document).ready(function () {
 
     };
 
-    var placemarks = [];
-    var createPlacemark = function (latlng, opt) {
-        opt = $.extend({
-            icon:'home.png',
-            text:""
-        }, opt);
-        var m = new L.Marker(latlng, {draggable:true});
-        map.addLayer(m);
-        m.setIcon(new MarkerIcon({iconUrl:icons.urlPrefix + opt.icon}));
-        var pmMenu = menu({
-            "Remove placemark":function () {
-                placemarks.splice(placemarks.indexOf(m), 1);
-                map.removeLayer(m);
-            },
-            "Edit info":function () {
-                editPlacemark(m);
-            }
-        });
-        m.on('contextmenu', pmMenu);
-        m.on('longclick', pmMenu);
 
-        m.icon = opt.icon;
-        m.text = opt.text;
-
-        placemarks.push(m);
-        editPlacemark(m);
-        return m;
-    };
 
     map.on("click", function (e) {
         if (placementMode) {
