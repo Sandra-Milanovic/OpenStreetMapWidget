@@ -27,7 +27,7 @@ var getShortLink = function (longURL, callback) {
         console.log(data);
         callback(data.data.url);
     });
-}
+};
 
 $(window).resize(function () {
     $("#map").width($(window).width());
@@ -35,7 +35,8 @@ $(window).resize(function () {
 });
 
 $(document).ready(function () {
-    //debug();
+
+    debug("192.168.88.158:8080");
 
 
     $('a.button').button();
@@ -64,30 +65,42 @@ $(document).ready(function () {
         var iconList = $("#editPlacemark .icons");
         iconList.html("");
 
+        if (L.Browser.touch) {
+            $("#editPlacemark .scroll").css({height:'auto'});
+            $("#editPlacemark .save-alt").button();
+            $("#editPlacemark .save-alt").show();
+            //$("#editPlacemark .scroll").scrollify();
+        }
+        else {
+            $("#editPlacemark .scroll").css({'overflow':'auto'});
+            $("#editPlacemark .save-alt").hide();
+        }
+
         icons.list.forEach(function (ico) {
             var icoDiv = $("<div />")
-		.addClass('icon')
+                .addClass('icon')
                 .text(ico.split('.')[0])
                 .css('background-image', 'url(' + icons.urlPrefix + ico + ')')
                 .attr('data-icon', ico)
                 .appendTo(iconList);
             if (ico == pm.icon) icoDiv.addClass('active');
             icoDiv.bind('click', function () {
+                console.log('icon clicked');
                 $("#editPlacemark .icons .icon").removeClass('active');
                 icoDiv.addClass('active');
                 $("#editPlacemark .iconval").val(icoDiv.attr('data-icon'));
             })
         });
-        $("#editPlacemark").dialog('option', 'buttons', {
-            Save:function () {
-                pm.text = $("#editPlacemark .text").val();
-                pm.icon = $("#editPlacemark .iconval").val();
-                pm.setIcon(new MarkerIcon({iconUrl:icons.urlPrefix + pm.icon}));
-                pm.on('contextmenu', pm.pmMenu);
-                pm.on('longclick', pm.pmMenu);
-                $("#editPlacemark").dialog('close');
-            }
-        });
+        var saveFn = function () {
+            pm.text = $("#editPlacemark .text").val();
+            pm.icon = $("#editPlacemark .iconval").val();
+            pm.setIcon(new MarkerIcon({iconUrl:icons.urlPrefix + pm.icon}));
+            pm.on('contextmenu', pm.pmMenu);
+            pm.on('longclick', pm.pmMenu);
+            $("#editPlacemark").dialog('close');
+        };
+        $("#editPlacemark").dialog('option', 'buttons', {Save:saveFn});
+        $("#editPlacemark .save-alt").unbind('click').bind('click', saveFn);
     };
 
     var placemarks = [];
@@ -110,10 +123,6 @@ $(document).ready(function () {
         });
         m.on('contextmenu', m.pmMenu);
         m.on('longclick', m.pmMenu);
-        m.on('dblclick', function() {
-            placemarks.splice(placemarks.indexOf(m), 1);
-            map.removeLayer(m);            
-        });
 
         m.icon = opt.icon;
         m.text = opt.text;
@@ -177,20 +186,8 @@ $(document).ready(function () {
         targetMarker.setIcon(new MarkerIcon({iconUrl:icons.urlPrefix + 'regroup.png'}));
         map.addLayer(targetMarker);
         placementMode = false;
-        targetMarker.on("dblclick", function (e) {
-            map.removeLayer(targetMarker);
-            targetMarker = null;
-        });
-        var targetMenu = menu({
-            "Edit info":function () {
-                editPlacemark(targetMarker);
-	    }
-        });
-        targetMarker.on("contextmenu", targetMenu);
-        targetMarker.on("longclick", targetMenu);
 
     };
-
 
 
     map.on("click", function (e) {
@@ -303,5 +300,7 @@ $(document).ready(function () {
         });
     });
 
-
+    setTimeout(function () {
+        console.log(map.getContainer());
+    }, 1000)
 });

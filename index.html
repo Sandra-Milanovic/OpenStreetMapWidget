@@ -2,7 +2,7 @@
 <head>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta content="True" name="HandheldFriendly">
-    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <meta content="width=320, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
     <link rel="stylesheet" type="text/css" href="main.css">
 
@@ -17,9 +17,13 @@
 <div id="map" style="height: 400px"></div>
 
 <div id="editPlacemark" style="display:none;">
-    Description: <input type="text" class="text" value=""><br><br>
+    Description: <input type="text" class="text" value="">
+    <a class="button save-alt" style="display:none">Save</a>
+    <br><br>
     <input type="hidden" class="iconval">
+    <div class="scroll">
     <div class="icons"></div>
+    </div>
 </div>
 
 <div id="dialog" style="display:none;">

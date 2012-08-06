@@ -8,13 +8,15 @@
     background-position: left center;
     float:left;
 }
+#editPlacemark .scroll {
+    height:15em;
+}
 #editPlacemark .icons {
-    height: 15em;
-    overflow:auto;
+    height: auto;
 }
 
 #editPlacemark .icons .icon.active {
-    background-color:#e5e3c9;
+    background-color:#d5d3c1;
 }
 
 .leaflet-marker-icon {
