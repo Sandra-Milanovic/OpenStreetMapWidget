@@ -18,7 +18,14 @@
 #editPlacemark .icons .icon.active {
     background-color:#d5d3c1;
 }
-
+div.leaflet-marker-pane > img.leaflet-marker-icon {
+    margin-top: -38px;
+    margin-left: -16px;
+}
+div.leaflet-marker-pane > img[src="polymarker.png"].leaflet-marker-icon {
+    margin-top:-8px;
+    margin-left:-8px;
+}
 .leaflet-marker-icon {
     -moz-user-drag: none; 
     -webkit-user-drag: none; 

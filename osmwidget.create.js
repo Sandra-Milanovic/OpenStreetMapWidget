@@ -69,7 +69,6 @@ $(document).ready(function () {
             $("#editPlacemark .scroll").css({height:'auto'});
             $("#editPlacemark .save-alt").button();
             $("#editPlacemark .save-alt").show();
-            //$("#editPlacemark .scroll").scrollify();
         }
         else {
             $("#editPlacemark .scroll").css({'overflow':'auto'});
@@ -161,13 +160,150 @@ $(document).ready(function () {
         osmTooltip(osmw.help.initialNoLocation);
     }
 
-    var targetMarker = null;
+
     // var placeMark2 = null;
 
 
     /* Editor */
 
-    var placementMode = false;
+
+    var targetMarker = null;
+
+    var polyline = {};
+    polyline.all = [];
+    polyline.current = null;
+    polyline.create = function (latlng) {
+        var self = {},
+            markers = [],
+            position = 0,
+            direction = 1,
+            poly = null,
+            type = "Polyline";
+
+        var makeMarker = function (latlng) {
+            var polyMark = new L.Marker(latlng, {draggable:true});
+            polyMark.setIcon(new PolyIcon({iconUrl:'polymarker.png'}));
+            map.addLayer(polyMark);
+
+            var polyMarkMenu = menu({
+                "Remove point":function () {
+                    self.remove(polyMark);
+                },
+                "Draw before":function () {
+                    position = markers.indexOf(polyMark);
+                    direction = 0;
+                    mode = 'polyedit'
+                },
+                "Draw after":function () {
+                    position = markers.indexOf(polyMark);
+                    direction = 1;
+                    mode = 'polyedit'
+                },
+                "Fill and stroke":function () {
+                    alert("TODO: Fill and Stroke dialog")
+                }
+            });
+            polyMark.on('longclick', polyMarkMenu);
+            polyMark.on('contextmenu', polyMarkMenu);
+            polyMark.on('dragend', updatePoly);
+            return polyMark;
+        };
+
+        var updatePoly = function () {
+            var latlngs = markers.map(function (m) {
+                return m.getLatLng();
+            });
+            if (!poly && markers.length > 1) {
+                poly = new L[type](latlngs, {color:'blue'});
+                map.addLayer(poly);
+            }
+            else if (poly && markers.length <= 1) {
+                map.removeLayer(poly);
+            }
+            if (markers.length > 1) {
+                poly.setLatLngs(latlngs);
+            }
+        };
+
+        self.setType = function (t) {
+            type = t;
+            poly = null;
+            updatePoly();
+        };
+
+        self.draw = function (latlng) {
+            position += direction;
+            markers.splice(position, 0, makeMarker(latlng));
+            updatePoly();
+        };
+
+        self.remove = function (m) {
+            if (m == null) {
+                markers.forEach(function (m) {
+                    map.removeLayer(m);
+                });
+                map.removeLayer(poly);
+                polyline.all.splice(polyline.all.indexOf(self), 1);
+            }
+            markers.splice(markers.indexOf(m), 1);
+            map.removeLayer(m);
+            updatePoly();
+        };
+        self.markers = function () {
+            return markers;
+        };
+        self.draw(latlng);
+        return self;
+    };
+
+
+    var mode = 'default';
+    var modes = {
+
+        default:{
+            mapclick:function () {
+
+            },
+            mapmenu:menu({
+                "Mark place":function (e) {
+                    createPlacemark(e.latlng);
+                },
+                "Start drawing":function (e) {
+                    polyline.current = polyline.create(e.latlng);
+                    polyline.all.push(polyline.current);
+                    mode = 'polyedit';
+                }
+            })
+        },
+        placement:{
+            mapclick:function (e) {
+                setTarget(e.latlng);
+                mode = 'default';
+                osmTooltip(osmw.help.afterTargetPlaced);
+            }
+        },
+        polyedit:{
+            mapclick:function (e) {
+                polyline.current.draw(e.latlng);
+            },
+            mapmenu:menu({
+                "Finish drawing":function (e) {
+                    mode = 'default';
+                }
+            })
+        }
+    };
+
+    var actionBind = function (action) {
+        return function () {
+            if (modes[mode].hasOwnProperty(action)) {
+                modes[mode][action].apply(this, arguments);
+            }
+            else {
+                modes.default[action].apply(this, arguments);
+            }
+        };
+    };
 
 
     var MarkerIcon = L.Icon.extend({
@@ -175,6 +311,13 @@ $(document).ready(function () {
         iconSize:new L.Point(32, 38),
         iconAnchor:new L.Point(16, 38),
         popupAnchor:new L.Point(16, -48)
+    });
+
+    var PolyIcon = L.Icon.extend({
+        iconUrl:'polymarker.png',
+        iconSize:new L.Point(16, 16),
+        iconAnchor:new L.Point(-8, -8),
+        popupAnchor:new L.Point(8, 8)
     });
 
 
@@ -190,30 +333,15 @@ $(document).ready(function () {
     };
 
 
-    map.on("click", function (e) {
-        if (placementMode) {
-            setTarget(e.latlng);
-            placementMode = false;
-            osmTooltip(osmw.help.afterTargetPlaced);
-        }
-    });
-
-    var mapContextMenu = menu({
-        "Add placemark":function (e) {
-            createPlacemark(e.latlng);
-        }
-    });
-
-    mapLongPress(map, mapContextMenu);
-    map.on("contextmenu", mapContextMenu);
+    map.on("click", actionBind('mapclick'));
+    mapLongPress(map, actionBind('mapmenu'));
+    map.on("contextmenu", actionBind('mapmenu'));
 
     // Place button and placement mode switcher
     $("#placeButton").bind('click', function () {
 
-        placementMode = !placementMode;
-
-
-        if (placementMode) {
+        mode = (mode == 'placement' ? 'default' : 'placement');
+        if (mode == 'placement') {
             if (targetMarker) map.removeLayer(targetMarker);
             osmTooltip(osmw.help.afterTarget);
         }
@@ -222,7 +350,6 @@ $(document).ready(function () {
             osmTooltip(osmw.help.beforeTarget);
         }
     });
-    var dialogVisible = false;
 
     // Send link by SMS. Recipient issue on some Android 2.3 phones
     $("#sendSms").bind('click', function () {
