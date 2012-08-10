@@ -70,6 +70,24 @@ $(document).ready(function () {
         })
     }
 
+    if ("polys" in params) {
+        params.polys.split(",").forEach(function(polyStr) {
+            var pArr = polyStr.split(";");
+            var latlngs = [], latlngsStr = pArr[0];
+            for (var k = 0; k < latlngsStr.length; k += 10) {
+                var ll = latLngCoder.decode(latlngsStr.substring(k,k+10));
+                latlngs.push(new L.LatLng(ll.lat, ll.lng));
+            }
+            var style = {
+                color: '#' + pArr[1],
+                fill: pArr[2] && pArr[2].length > 0,
+                fillColor: pArr[2] && pArr[2].length > 0 ? '#' + pArr[2] : null
+            };
+            var type = style.fillColor ? 'Polygon' : 'Polyline';
+            map.addLayer(new L[type](latlngs, style));
+        });
+    }
+
     var myMarker = null, lastRouteRequest = 0, lastPoly;
     // Request repeated updates.
     if (navigator.geolocation) {

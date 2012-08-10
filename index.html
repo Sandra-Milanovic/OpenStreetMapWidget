@@ -2,7 +2,7 @@
 <head>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta content="True" name="HandheldFriendly">
-    <meta content="width=320, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
 
     <link rel="stylesheet" type="text/css" href="main.css">
 
@@ -15,6 +15,13 @@
 </head>
 <body>
 <div id="map" style="height: 400px"></div>
+
+<div id="editPoly" style="display:none;">
+    <p><span class="fixedWidth">Line color</span>
+    <input type="hidden" name="stroke" class="color-picker stroke" value="#0000ff" /></p>
+    <p><span class="fixedWidth"><label for="cbFill"><input type="checkbox" class="cbFill" name="cbFill" class="fill"> Fill color</label></span>
+    <input type="hidden" name="fill" class="color-picker fill" value="#0000ff" /></p>
+</div>
 
 <div id="editPlacemark" style="display:none;">
     Description: <input type="text" class="text" value="">
@@ -50,6 +57,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
 <script src="http://cdn.leafletjs.com/leaflet-0.4/leaflet.js"></script>
+<script src="http://labs.abeautifulsite.net/jquery-miniColors/jquery.miniColors.js"></script>
 <!--<script type="text/javascript" src="bitly/jquery.bitly.js"></script>-->
 <script type="text/javascript" src="osmwidget.lib.js"></script>
 <script type="text/javascript" src="osmwidget.create.js"></script>

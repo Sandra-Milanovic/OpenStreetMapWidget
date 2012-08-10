@@ -41,11 +41,13 @@ $(document).ready(function () {
 
     $('a.button').button();
 
+    var defaultWidth = Math.min(500,$(window).width()*0.9);
+
     $("#dialog").dialog({
         autoOpen:false,
         bgIframe:true,
         title:"Embed map",
-        width:Math.min(500, $(window).width() * 0.9)
+        width:defaultWidth
     });
 
 
@@ -53,7 +55,14 @@ $(document).ready(function () {
         autoOpen:false,
         bgIframe:true,
         title:"Edit placemark",
-        width:Math.min(500, $(window).width() * 0.9)
+        width:defaultWidth
+    });
+
+    $("#editPoly").dialog({
+        autoOpen:false,
+        bgIframe:true,
+        title:"Edit polyline info",
+        width:Math.min(240, defaultWidth)
     });
 
 
@@ -178,14 +187,23 @@ $(document).ready(function () {
             position = 0,
             direction = 1,
             poly = null,
-            type = "Polyline";
-
+            type = "Polyline",
+            style = {
+                stroke:true,
+                color: "#0000FF",
+                fill: false,
+                fillColor:"#0000FF"
+            }
+            
         var makeMarker = function (latlng) {
             var polyMark = new L.Marker(latlng, {draggable:true});
             polyMark.setIcon(new PolyIcon({iconUrl:'polymarker.png'}));
             map.addLayer(polyMark);
 
             var polyMarkMenu = menu({
+                "Stop drawing": function() {
+                    mode = 'default';
+                },
                 "Remove point":function () {
                     self.remove(polyMark);
                 },
@@ -199,8 +217,25 @@ $(document).ready(function () {
                     direction = 1;
                     mode = 'polyedit'
                 },
-                "Fill and stroke":function () {
-                    alert("TODO: Fill and Stroke dialog")
+                "Fill and line":function () {
+                    $("#editPoly").dialog('open');
+                    var pickers = $("#editPoly .color-picker"); 
+                    $("#editPoly .stroke").val(style.color);
+                    $("#editPoly .fill").val(style.fillColor);
+                    $("#editPoly .cbFill").val(style.fill);
+
+                    console.log(pickers);
+                    pickers.miniColors({letterCase: 'uppercase'});
+                    $("#editPoly").dialog('option', 'buttons', {
+                        Save:function() {
+                            style.color     = $("#editPoly .stroke").val();
+                            style.fill      = $("#editPoly .cbFill").is(":checked");
+                            console.log(style.fill);
+                            style.fillColor = $("#editPoly .fill").val();
+                            setStyle(style);     
+                            $("#editPoly").dialog('close');
+                        }
+                    });
                 }
             });
             polyMark.on('longclick', polyMarkMenu);
@@ -214,7 +249,7 @@ $(document).ready(function () {
                 return m.getLatLng();
             });
             if (!poly && markers.length > 1) {
-                poly = new L[type](latlngs, {color:'blue'});
+                poly = new L[type](latlngs, style);
                 map.addLayer(poly);
             }
             else if (poly && markers.length <= 1) {
@@ -225,11 +260,16 @@ $(document).ready(function () {
             }
         };
 
-        self.setType = function (t) {
-            type = t;
+        var setStyle = self.setStyle = function (s) {
+            style = s;
+            type = style.fill ? 'Polygon' : 'Polyline';
+            if (poly) map.removeLayer(poly);
             poly = null;
             updatePoly();
         };
+        var getStyle = self.getStyle = function() {
+            return style;
+        }
 
         self.draw = function (latlng) {
             position += direction;
@@ -253,6 +293,15 @@ $(document).ready(function () {
             return markers;
         };
         self.draw(latlng);
+
+        var toString = self.toString = function() {
+            var latlngsString = markers.map(function(m) { return latLngCoder.encode(m.getLatLng()) }).join("");
+            var polyString = latlngsString + ";" + style.color.substring(1) + ";" + (style.fill ? style.fillColor.substring(1) : '');
+            console.log(latlngsString);
+            console.log(polyString);
+            return polyString;
+        }
+
         return self;
     };
 
@@ -287,7 +336,7 @@ $(document).ready(function () {
                 polyline.current.draw(e.latlng);
             },
             mapmenu:menu({
-                "Finish drawing":function (e) {
+                "Stop drawing":function (e) {
                     mode = 'default';
                 }
             })
@@ -389,18 +438,30 @@ $(document).ready(function () {
             return latLngCoder.encode(pm.getLatLng()) + ";" + pm.icon + ";" + pm.text;
         }).join(",");
 
-        var link = hostPart + "/show.html?" + putParams({
+        var polysString = polyline.all.map(function(pl) { return pl.toString(); }).join(",");
+
+        var paramsObj = {
             lat:mapPosition.lat.toFixed(5),
             lng:mapPosition.lng.toFixed(5),
             zoom:mapZoom,
             map:window.whichLayer,
+            target: targetMarker != undefined ? (targetMarker.getLatLng().lat.toFixed(5) + "," + targetMarker.getLatLng().lng.toFixed(5)) : null,
+            polys: polysString,
             places:pmString
-        });
-
-        if (targetMarker != undefined) {
-            var markerLatLng = targetMarker.getLatLng();
-            link += "&" + putParams({target:markerLatLng.lat.toFixed(5) + "," + markerLatLng.lng.toFixed(5)})
         }
+       
+        // Optimize URL 
+        for (var key in paramsObj) if (paramsObj.hasOwnProperty(key)) 
+            if (!paramsObj[key] || paramsObj[key].length < 1)
+                delete paramsObj[key];
+        
+
+        var link = hostPart + "/show.html?" + putParams(paramsObj);
+
+        //if (targetMarker != undefined) {
+            //var markerLatLng = targetMarker.getLatLng();
+            //link += "&" + putParams({target:markerLatLng.lat.toFixed(5) + "," + markerLatLng.lng.toFixed(5)})
+        //}
 
         $("#dialog a").attr("href", link);
         $("#dialog input.shortLink").val(link);
