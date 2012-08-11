@@ -157,27 +157,31 @@ $(document).ready(function () {
                 console.log(response);
                 $("#directionsPanel").html("");
                 $("<table />").appendTo("#directionsPanel");
-                response.route.legs[0].maneuvers.forEach(function (item) {
-                    var row = $('<tr />').addClass('point');
-                    $('<img />').attr('src', item.iconUrl).appendTo($('<td/>').appendTo(row));
-                    var textCell = $('<td />').addClass('text');
-                    textCell.html(item.narrative);
+                if (response.route && response.route.legs && response.route.legs.length) {
+                    response.route.legs[0].maneuvers.forEach(function (item) {
+                        var row = $('<tr />').addClass('point');
+                        $('<img />').attr('src', item.iconUrl).appendTo($('<td/>').appendTo(row));
+                        var textCell = $('<td />').addClass('text');
+                        textCell.html(item.narrative);
 
-                    textCell.appendTo(row);
+                        textCell.appendTo(row);
 
-                    var distCell = $('<td />').addClass('distance');
-                    distCell.html(Convert.toDistance(item.distance))
-                    distCell.appendTo(row);
+                        var distCell = $('<td />').addClass('distance');
+                        distCell.html(Convert.toDistance(item.distance))
+                        distCell.appendTo(row);
 
-                row.appendTo($("#directionsPanel"));
-                });
-                var latLngs = [], sp = response.route.shape.shapePoints;
-                for (var k = 0; k < sp.length; k += 2) {
-                    latLngs.push(new L.LatLng(sp[k], sp[k + 1]));
+                    row.appendTo($("#directionsPanel"));
+                    });
                 }
-                if (lastPoly) map.removeLayer(lastPoly);
-                lastPoly = new L.Polyline(latLngs);
-                map.addLayer(lastPoly);
+                if (response.route && response.route.shape && response.route.shape.shapePoints) {
+                    var latLngs = [], sp = response.route.shape.shapePoints;
+                    for (var k = 0; k < sp.length; k += 2) {
+                        latLngs.push(new L.LatLng(sp[k], sp[k + 1]));
+                    }
+                    if (lastPoly) map.removeLayer(lastPoly);
+                    lastPoly = new L.Polyline(latLngs);
+                    map.addLayer(lastPoly);
+                }
             });
 
     }, 1000);
