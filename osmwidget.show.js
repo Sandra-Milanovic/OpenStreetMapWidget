@@ -48,13 +48,36 @@ $(document).ready(function () {
     });
 
 
+    var targetMarker = null, myMarker = null;
+
+    var createMyMarker = function(lat, lng) {
+        myMarker = new L.Marker(new L.LatLng(lat, lng), {draggable:true});
+        myMarker.setIcon(new MarkerIcon({iconUrl:icons.urlPrefix + 'home.png'}));
+        map.addLayer(myMarker);
+        myMarker.on('dragstart', function() {
+            updateMyMarker = false; 
+        });
+        myMarker.on(tevents.menu, menu({
+            "Follow my location": function() {
+                if (lastKnownPosition)
+                    myMarker.setLatLng(new L.LatLng(lastKnownPosition.lat, lastKnownPosition.lng));
+                updateMyMarker = true;
+            }
+        }));
+    }
+
     if ("target" in params) {
 
 
-        tagetLocation = new L.LatLng(markerLat, markerLng);
-        var target = new L.Marker(tagetLocation, {draggable:true});
-        target.setIcon(new MarkerIcon({iconUrl:icons.urlPrefix + 'regroup.png'}));
-        map.addLayer(target);
+        targetLocation = new L.LatLng(markerLat, markerLng);
+        targetMarker = new L.Marker(targetLocation, {draggable:true});
+        targetMarker.setIcon(new MarkerIcon({iconUrl:icons.urlPrefix + 'regroup.png'}));
+        map.addLayer(targetMarker);
+        targetMarker.on(tevents.menu, menu({
+            "Reset location": function() {
+                targetMarker.setLatLng(targetLocation);
+            }
+        }));
     }
 
     if ("places" in params) {
@@ -88,63 +111,75 @@ $(document).ready(function () {
         });
     }
 
-    var myMarker = null, lastRouteRequest = 0, lastPoly;
+    var lastPoly, lastRequest = 0;
+    // Request directions updates every 60 seconds
+    setInterval(function() {
+
+        if (!myMarker || !targetMarker || (new Date().getTime() - lastRequest) < 60000) return;
+        lastRequest = new Date().getTime();
+
+        var srcLoc = myMarker.getLatLng();
+        var dstLoc = targetMarker.getLatLng();
+        /*
+           callback=e&outFormat=json&routeType=shortest&timeType=1&enhancedNarrative=false
+           &shapeFormat=raw&generalize=200&locale=en_GB&unit=m
+           &from=38.89403,-77.075555&to=38.84457,-77.078222
+           &drivingStyle=2&highwayEfficiency=21.0
+           */
+        $.getJSON('http://open.mapquestapi.com/directions/v0/route?callback=?', {
+            outFormat:'json',
+            routeType:'shortest', // make options for this
+            timeType:1, // options
+            enhancedNarrative:true,
+            narrativeType:'microformat',
+            shapeFormat:'raw',
+            generalize:200,
+            locale:'en_GB',
+            unit:'m',
+            from:[srcLoc.lat, srcLoc.lng].join(','),
+            to:[dstLoc.lat, dstLoc.lng].join(','),
+            drivingStyle:2, // not sure if options
+            highwayEfficiency:21.0 // also not sure if options
+            }, function (response) {
+                console.log(response);
+                $("#directionsPanel").html("");
+                $("<table />").appendTo("#directionsPanel");
+                response.route.legs[0].maneuvers.forEach(function (item) {
+                    var row = $('<tr />').addClass('point');
+                    $('<img />').attr('src', item.iconUrl).appendTo($('<td/>').appendTo(row));
+                    var textCell = $('<td />').addClass('text');
+                    textCell.html(item.narrative);
+
+                    textCell.appendTo(row);
+
+                    var distCell = $('<td />').addClass('distance');
+                    distCell.html(Convert.toDistance(item.distance))
+                    distCell.appendTo(row);
+
+                row.appendTo($("#directionsPanel"));
+                });
+                var latLngs = [], sp = response.route.shape.shapePoints;
+                for (var k = 0; k < sp.length; k += 2) {
+                    latLngs.push(new L.LatLng(sp[k], sp[k + 1]));
+                }
+                if (lastPoly) map.removeLayer(lastPoly);
+                lastPoly = new L.Polyline(latLngs);
+                map.addLayer(lastPoly);
+            });
+
+    }, 1000);
+
     // Request repeated updates.
+    var updateMyMarker = true, lastKnownPosition = null;
     if (navigator.geolocation) {
         navigator.geolocation.watchPosition(function (position) {
-            if (myMarker) map.removeLayer(myMarker);
-            myMarker = new L.Marker(new L.LatLng(position.coords.latitude, position.coords.longitude), {draggable:true})
-            myMarker.setIcon(new MarkerIcon({iconUrl:icons.urlPrefix + 'home.png'}));
-            map.addLayer(myMarker);
-            if (tagetLocation && new Date().getTime() - lastRouteRequest > 60000) {
-
-                $.getJSON('http://open.mapquestapi.com/directions/v0/route?callback=?', {
-                    outFormat:'json',
-                    routeType:'shortest', // make options for this
-                    timeType:1, // options
-                    enhancedNarrative:true,
-                    narrativeType:'microformat',
-                    shapeFormat:'raw',
-                    generalize:200,
-                    locale:'en_GB',
-                    unit:'m',
-                    from:[position.coords.latitude, position.coords.longitude].join(','),
-                    to:[tagetLocation.lat, tagetLocation.lng].join(','),
-                    drivingStyle:2, // not sure if options
-                    highwayEfficiency:21.0 // also not sure if options
-                }, function (response) {
-                    console.log(response);
-                    $("#directionsPanel").html("");
-                    $("<table />").appendTo("#directionsPanel");
-                    response.route.legs[0].maneuvers.forEach(function (item) {
-                        var row = $('<tr />').addClass('point');
-                        $('<img />').attr('src', item.iconUrl).appendTo($('<td/>').appendTo(row));
-                        var textCell = $('<td />').addClass('text');
-                        textCell.html(item.narrative);
-
-                        textCell.appendTo(row);
-
-                        var distCell = $('<td />').addClass('distance');
-                        distCell.html(Convert.toDistance(item.distance))
-                        distCell.appendTo(row);
-
-                        row.appendTo($("#directionsPanel"));
-                    });
-                    var latLngs = [], sp = response.route.shape.shapePoints;
-                    for (var k = 0; k < sp.length; k += 2) {
-                        latLngs.push(new L.LatLng(sp[k], sp[k + 1]));
-                    }
-                    if (lastPoly) map.removeLayer(lastPoly);
-                    lastPoly = new L.Polyline(latLngs);
-                    map.addLayer(lastPoly);
-                });
-                /*
-                 callback=e&outFormat=json&routeType=shortest&timeType=1&enhancedNarrative=false
-                 &shapeFormat=raw&generalize=200&locale=en_GB&unit=m
-                 &from=38.89403,-77.075555&to=38.84457,-77.078222
-                 &drivingStyle=2&highwayEfficiency=21.0
-                 */
-            }
+            lastKnownPosition = {lat: position.coords.latitude, lng: position.coords.longitude};
+            if (!updateMyMarker) return;
+            if (!myMarker) 
+                createMyMarker(position.coords.latitude, position.coords.longitude);
+            else
+                myMarker.setLatLng(new L.LatLng(position.coords.latitude, position.coords.longitude));
+                                            
         }, null, {enableHighAccuracy:true});
     }
 
