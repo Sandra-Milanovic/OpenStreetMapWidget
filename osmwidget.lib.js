@@ -19,14 +19,16 @@ if (L.Browser.touch) {
         'down':'touchstart',
         'up':'touchend',
         'move':'touchmove',
-        'click':'tap'
+        'click':'tap',
+        'menu': 'longclick'
     }
 } else {
     window.tevents = {
         'down':'mousedown',
         'up':'mouseup',
         'move':'mousemove',
-        'click':'click'
+        'click':'click',
+        'menu': 'contextmenu'
     }
 }
 
@@ -112,11 +114,6 @@ window.menu = function (menu) {
         if (e.stopPropagation) e.stopPropagation();
     };
 };
-
-//bla.on('contextmenu longclick', menu({
-//    "Delete": function(e) {  },
-//    "Reset": function(e) {  }
-//}));
 
 
 window.Layers = {

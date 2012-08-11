@@ -36,7 +36,7 @@ $(window).resize(function () {
 
 $(document).ready(function () {
 
-    debug("192.168.88.158:8080");
+    debug("192.168.100.16:8080");
 
 
     $('a.button').button();
@@ -103,8 +103,7 @@ $(document).ready(function () {
             pm.text = $("#editPlacemark .text").val();
             pm.icon = $("#editPlacemark .iconval").val();
             pm.setIcon(new MarkerIcon({iconUrl:icons.urlPrefix + pm.icon}));
-            pm.on('contextmenu', pm.pmMenu);
-            pm.on('longclick', pm.pmMenu);
+            pm.on(tevents.menu, pm.pmMenu);
             $("#editPlacemark").dialog('close');
         };
         $("#editPlacemark").dialog('option', 'buttons', {Save:saveFn});
@@ -129,8 +128,7 @@ $(document).ready(function () {
                 editPlacemark(m);
             }
         });
-        m.on('contextmenu', m.pmMenu);
-        m.on('longclick', m.pmMenu);
+        m.on(tevents.menu, m.pmMenu);
 
         m.icon = opt.icon;
         m.text = opt.text;
@@ -238,8 +236,7 @@ $(document).ready(function () {
                     });
                 }
             });
-            polyMark.on('longclick', polyMarkMenu);
-            polyMark.on('contextmenu', polyMarkMenu);
+            polyMark.on(tevents.menu, polyMarkMenu);
             polyMark.on('dragend', updatePoly);
             return polyMark;
         };
@@ -382,9 +379,14 @@ $(document).ready(function () {
     };
 
 
-    map.on("click", actionBind('mapclick'));
-    mapLongPress(map, actionBind('mapmenu'));
-    map.on("contextmenu", actionBind('mapmenu'));
+    map.on("click", function() {
+        if ($("body > div.menu-closer").length) return;
+        actionBind('mapclick').apply(this, arguments);
+    });
+    if (tevents.menu == 'longpress')
+        mapLongPress(map, actionBind('mapmenu'));
+    else
+        map.on("contextmenu", actionBind('mapmenu'));
 
     // Place button and placement mode switcher
     $("#placeButton").bind('click', function () {
