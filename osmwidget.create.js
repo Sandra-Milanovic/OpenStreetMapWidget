@@ -24,7 +24,6 @@ var getShortLink = function (longURL, callback) {
         access_token:"9e6943f1fa1d50b25cd1cca6e5437a9ab5f2a1a7",
         longUrl:longURL
     }, function (data) {
-        console.log(data);
         callback(data.data.url);
     });
 };
@@ -36,7 +35,7 @@ $(window).resize(function () {
 
 $(document).ready(function () {
 
-    debug("192.168.100.16:8080");
+    debug("192.168.43.50:8080");
 
 
     $('a.button').button();
@@ -93,7 +92,6 @@ $(document).ready(function () {
                 .appendTo(iconList);
             if (ico == pm.icon) icoDiv.addClass('active');
             icoDiv.bind('click', function () {
-                console.log('icon clicked');
                 $("#editPlacemark .icons .icon").removeClass('active');
                 icoDiv.addClass('active');
                 $("#editPlacemark .iconval").val(icoDiv.attr('data-icon'));
@@ -222,13 +220,11 @@ $(document).ready(function () {
                     $("#editPoly .fill").val(style.fillColor);
                     $("#editPoly .cbFill").val(style.fill);
 
-                    console.log(pickers);
                     pickers.miniColors({letterCase: 'uppercase'});
                     $("#editPoly").dialog('option', 'buttons', {
                         Save:function() {
                             style.color     = $("#editPoly .stroke").val();
                             style.fill      = $("#editPoly .cbFill").is(":checked");
-                            console.log(style.fill);
                             style.fillColor = $("#editPoly .fill").val();
                             setStyle(style);     
                             $("#editPoly").dialog('close');
@@ -294,8 +290,6 @@ $(document).ready(function () {
         var toString = self.toString = function() {
             var latlngsString = markers.map(function(m) { return latLngCoder.encode(m.getLatLng()) }).join("");
             var polyString = latlngsString + ";" + style.color.substring(1) + ";" + (style.fill ? style.fillColor.substring(1) : '');
-            console.log(latlngsString);
-            console.log(polyString);
             return polyString;
         }
 
@@ -383,7 +377,7 @@ $(document).ready(function () {
         if ($("body > div.menu-closer").length) return;
         actionBind('mapclick').apply(this, arguments);
     });
-    if (tevents.menu == 'longpress')
+    if (tevents.menu == 'longclick') 
         mapLongPress(map, actionBind('mapmenu'));
     else
         map.on("contextmenu", actionBind('mapmenu'));
@@ -422,7 +416,6 @@ $(document).ready(function () {
      setTimeout is used with the goal to change the focus from the textbox.
      to prevent virtual keyboards from popping out */
     $("#generateLink").bind('click', function () {
-        console.log(targetMarker);
         $("#dialog").dialog({modal:true});
         $("#dialog").dialog('open');
 
@@ -490,7 +483,4 @@ $(document).ready(function () {
         });
     });
 
-    setTimeout(function () {
-        console.log(map.getContainer());
-    }, 1000)
 });
