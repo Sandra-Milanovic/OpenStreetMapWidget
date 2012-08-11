@@ -80,6 +80,19 @@ $(document).ready(function () {
         }));
     }
 
+    var mapMenu = menu({
+        "Set my location": function(e) {
+            if (!myMarker) createMyMarker(e.latlng.lat, e.latlng.lng);
+            else myMarker.setLatLng(e.latlng);
+            updateMyMarker = false;
+        }        
+    });
+    if (tevents.menu == 'longclick') 
+        mapLongPress(map, mapMenu); 
+    else
+        map.on("contextmenu", mapMenu); 
+
+
     if ("places" in params) {
         params.places.split(",").forEach(function (pStr) {
             var pArr = pStr.split(';');

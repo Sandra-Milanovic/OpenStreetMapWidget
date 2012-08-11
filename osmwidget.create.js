@@ -377,6 +377,8 @@ $(document).ready(function () {
         if ($("body > div.menu-closer").length) return;
         actionBind('mapclick').apply(this, arguments);
     });
+
+
     if (tevents.menu == 'longclick') 
         mapLongPress(map, actionBind('mapmenu'));
     else
