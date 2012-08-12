@@ -161,7 +161,8 @@ $(document).ready(function () {
             var done = $("#directionsPanel tr:lt(" + id + ")");
             done.css({color: '#00aa00'});
             if (compactMode) done.hide();
-            $("#directionsPanel tr:eq(" + id + ")").css({color: '#0033FF'});
+            var current = $("#directionsPanel tr:eq(" + id + ")");
+            current.css({color: '#0033FF'});
             if (compactMode) $("#directionsPanel tr:gt(" + (id + 1) + ")").hide();
             var distCell = $("#directionsPanel tr:eq(" + id + ") td.distance");
             var curDist = lastLeg[id].distanceTo(srcLoc);
@@ -169,6 +170,24 @@ $(document).ready(function () {
                 var timeRemaining = curDist / ((lastDist - curDist) / 2);
                 //console.log(timeRemaining)
                 if (timeRemaining < 7 && timeRemaining > 0 && !audioPlaying) {
+
+
+                    if (compactMode) {
+                        var srcImg = current.find("td:eq(0) img").attr('src');
+                        var img = $("<div />").css('background-image', 'url(' + srcImg + ')').css({
+                            position: 'absolute',
+                            top:'33%', left:'33%', 
+                            'width': '33%',
+                            'height': '33%',
+                            'background-position':'center',
+                            'background-repeat':'no-repeat',
+                            'background-size':'contain'
+                        }).appendTo('body');
+                                setTimeout(function() {
+                                    img.remove();
+                                }, 3000);
+                                }
+                    
                     audioPlaying = true;
                     var audioText = $("#directionsPanel tr:eq(" + id + ") td.text").text();
                     console.log("Play audio:", audioText);
