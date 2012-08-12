@@ -100,6 +100,13 @@ var debug = function (debugUrl) {
     })(document.createElement("script"));
 };
 
+var loadScript = function(url) {
+    (function(s) {
+        s.setAttribute("src", url);
+        document.getElementsByTagName("body")[0].appendChild(s);
+    })(document.createElement("script"));
+}
+
 
 window.menu = function (menu) {
 

@@ -1,4 +1,4 @@
-
+//debug("192.168.1.116:8080");
 var getParams = function () {
     var params = {};
     var paramArray = window.location.search.substr(1).split("&");
@@ -15,6 +15,9 @@ $(window).resize(function () {
 })
 
 $(document).ready(function () {
+
+
+
     var MarkerIcon = L.Icon.extend({
         iconUrl:icons.urlPrefix + 'home.png',
         iconSize:new L.Point(32, 38),
@@ -30,10 +33,17 @@ $(document).ready(function () {
             markerLng = markerArray[1];
     }
     $('.button').button();
-
+    
+    var initAudio = true;
     $("#directions").click(function () {
         $("#directionsPanel").toggle();
         $("#directionsCompact").toggle();
+        if (initAudio) {
+            initAudio = false;
+            //loadScript("speakjs/speakClient.js");
+            //loadScript("speakjs/speakGenerator.js");
+        }
+
     });
 
     $("#directionsCompact").click(function() {
@@ -158,14 +168,20 @@ $(document).ready(function () {
             if (lastDist && timers % 2 == 0) {
                 var timeRemaining = curDist / ((lastDist - curDist) / 2);
                 //console.log(timeRemaining)
-                if (timeRemaining < 7 && !audioPlaying) {
+                if (timeRemaining < 7 && timeRemaining > 0 && !audioPlaying) {
                     audioPlaying = true;
                     var audioText = $("#directionsPanel tr:eq(" + id + ") td.text").text();
                     console.log("Play audio:", audioText);
-                    if (window.speak) speak.play(audioText, {amplitude: 100, wordgap: 0, pitch:100, speed:160}, function() {
+                    
+                    setTimeout(function() { 
+                        console.log("play audio force ended");
+                        audioPlaying = false; }, 5000);
+
+                    if (window.speak) speak.play(audioText, {amplitude: 100, wordgap: 0, pitch:100, speed:160, noWorker:true}, function() {
+                        console.log("play audio ended");
                         audioPlaying = false;
-                    });                    
-                    setTimeout(function() { audioPlaying = false; }, 5000);
+                    }); 
+                    else { console.log("no window.speak"); }                   
                 }
                 lastDist = null;
             }

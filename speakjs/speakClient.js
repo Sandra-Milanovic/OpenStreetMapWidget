@@ -17,10 +17,15 @@
   }
 
   var speakWorker;
+
+  var noWorker;
   try {
     speakWorker = new Worker('speakjs/speakWorker.js');
+    noWorker = false;
   } catch(e) {
+      noWorker = true;
     console.log('speak.js warning: no worker support');
+
   }
 
   speak.pause = function() {
@@ -115,10 +120,24 @@
       if (PROFILE) console.log('speak.js: wav processing took ' + (Date.now()-startTime).toFixed(2) + ' ms');
     }
 
-    if (args && args.noWorker) {
+    if (noWorker) {
       // Do everything right now. speakGenerator.js must have been loaded.
       var startTime = Date.now();
-      var wav = generateSpeech(text, args);
+      try {
+        var wav = generateSpeech(text, args);
+      } catch (e) {
+
+          var callstack = [];
+          var currentFunction = arguments.callee? arguments.callee.caller:null;
+          while (currentFunction) {
+              var fn = currentFunction.toString();
+              var fname = fn.substring(0, fn.indexOf('{')) || 'anonymous';
+              callstack.push(fname);
+              currentFunction = currentFunction.caller;
+          }
+          console.log("generateSpeach error:", e);
+          console.log(callstack);
+      }
       if (PROFILE) console.log('speak.js: processing took ' + (Date.now()-startTime).toFixed(2) + ' ms');
       handleWav(wav);
     } else {
