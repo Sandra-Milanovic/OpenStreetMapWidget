@@ -32,6 +32,54 @@ if (L.Browser.touch) {
     }
 }
 
+
+
+var closestPoint = function(xt, yt, x1, y1, x2, y2) {
+    var inRect = function(x, y, x1, y1, x2, y2) {
+        return x > Math.min(x1, x2) && x < Math.max(x1, x2)
+            && y > Math.min(y1, y2) && y < Math.max(y1, y2);
+    }
+
+    var k = (y2 - y1) / (x2 - x1),
+        x = (k * (xt + x1) + yt - y1) / (2 * k),
+        y = k * (x - x1) + y1;
+
+
+    if (inRect(x, y, x1, y1, x2, y2)) return {x: x, y: y, inside: true};
+
+    var dx1 = x - x1, dx2 = x - x2, dy1 = y - y1, dy2 = y - y2;
+    
+    if (Math.sqrt(dx1 * dx1 + dy1 * dy1) < Math.sqrt(dx2 * dx2 + dy2 * dy2))
+        return {x: x1, y: y1};
+    else 
+        return {x: x2, y: y2};
+}
+
+// this approximation is okay
+var closestLatLng = function(ll, ll1, ll2) {
+    var cp = closestPoint(ll.lat, ll.lng, ll1.lat, ll1.lng, ll2.lat, ll2.lng);
+    return {lat: cp.x, lng: cp.y, inside: cp.inside};
+}
+
+var closestLatLngPoly = function(ll, latlngs) {
+    var minDistance = Number.POSITIVE_INFINITY, minLL = null, minSeg = -1;
+    for (var k = 1; k < latlngs.length; ++k) {
+        var a = k - 1, b = k;
+        var cl = closestLatLng(ll, latlngs[a], latlngs[b]);
+        var cDist = new L.LatLng(cl.lat, cl.lng).distanceTo(ll);
+        if (cDist < minDistance) {
+            minDistance = cDist;
+            minLL = cl;
+            minSeg = k - 1;
+        }
+    }
+    return {latlng: minLL, distance: minDistance, segment: minSeg};
+}
+
+$(function() {
+    if (L.Browser.touch) $('.hide-mobile').hide();
+});
+
 var debug = function (debugUrl) {
     (function (e) {
         e.addEventListener('load', function () {
@@ -52,7 +100,6 @@ var debug = function (debugUrl) {
     })(document.createElement("script"));
 };
 
-//debug();
 
 window.menu = function (menu) {
 

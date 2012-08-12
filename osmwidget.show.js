@@ -1,4 +1,4 @@
-//show.html?lat=lat&lngr=lng&zoom=zoom&target=lat,lng
+
 var getParams = function () {
     var params = {};
     var paramArray = window.location.search.substr(1).split("&");
@@ -33,9 +33,15 @@ $(document).ready(function () {
 
     $("#directions").click(function () {
         $("#directionsPanel").toggle();
+        $("#directionsCompact").toggle();
     });
-    $("#map").width($(window).width())
-    ;
+
+    $("#directionsCompact").click(function() {
+        compactMode = !compactMode;
+    });
+
+    $("#map").width($(window).width());
+    
     $("#map").height($(window).height());
     var map = new L.Map('map');
     map.setView(new L.LatLng(params.lat, params.lng), params.zoom);
@@ -79,6 +85,8 @@ $(document).ready(function () {
             }
         }));
     }
+
+    var compactMode = false;
 
     var mapMenu = menu({
         "Set my location": function(e) {
@@ -124,21 +132,62 @@ $(document).ready(function () {
         });
     }
 
-    var lastPoly, lastRequest = 0;
+    var lastPoly, lastRequest = 0, lastLeg = null, lastDist = null;
     // Request directions updates every 60 seconds
+    var timers = 0, audioPlaying = false;
+    
     setInterval(function() {
+        ++timers;
 
-        if (!myMarker || !targetMarker || (new Date().getTime() - lastRequest) < 60000) return;
-        lastRequest = new Date().getTime();
 
+        if (!myMarker || !targetMarker || (new Date().getTime() - lastRequest) < 5000) return;
         var srcLoc = myMarker.getLatLng();
         var dstLoc = targetMarker.getLatLng();
+
+        if (lastLeg) {
+            var minll = closestLatLngPoly(srcLoc, lastLeg);
+            var id = minll.segment + 1;
+            $("#directionsPanel tr").css({color: 'inherit'}).show();
+            var done = $("#directionsPanel tr:lt(" + id + ")");
+            done.css({color: '#00aa00'});
+            if (compactMode) done.hide();
+            $("#directionsPanel tr:eq(" + id + ")").css({color: '#0033FF'});
+            if (compactMode) $("#directionsPanel tr:gt(" + (id + 1) + ")").hide();
+            var distCell = $("#directionsPanel tr:eq(" + id + ") td.distance");
+            var curDist = lastLeg[id].distanceTo(srcLoc);
+            if (lastDist && timers % 2 == 0) {
+                var timeRemaining = curDist / ((lastDist - curDist) / 2);
+                //console.log(timeRemaining)
+                if (timeRemaining < 7 && !audioPlaying) {
+                    audioPlaying = true;
+                    var audioText = $("#directionsPanel tr:eq(" + id + ") td.text").text();
+                    console.log("Play audio:", audioText);
+                    if (window.speak) speak.play(audioText, {amplitude: 100, wordgap: 0, pitch:100, speed:160}, function() {
+                        audioPlaying = false;
+                    });                    
+                    setTimeout(function() { audioPlaying = false; }, 5000);
+                }
+                lastDist = null;
+            }
+            lastDist = curDist;
+            //console.log(curDist);
+            distCell.text(Convert.toDistance(curDist / 1000));
+        }
+
+       
+        if (lastPoly) {
+            var minll = closestLatLngPoly(srcLoc, lastPoly.getLatLngs());
+            //console.log("We're still on track!");
+            if (minll.distance < 100) return; 
+        }
+
         /*
            callback=e&outFormat=json&routeType=shortest&timeType=1&enhancedNarrative=false
            &shapeFormat=raw&generalize=200&locale=en_GB&unit=m
            &from=38.89403,-77.075555&to=38.84457,-77.078222
            &drivingStyle=2&highwayEfficiency=21.0
            */
+        lastRequest = new Date().getTime();
         $.getJSON('http://open.mapquestapi.com/directions/v0/route?callback=?', {
             outFormat:'json',
             routeType:'shortest', // make options for this
@@ -158,6 +207,7 @@ $(document).ready(function () {
                 $("#directionsPanel").html("");
                 $("<table />").appendTo("#directionsPanel");
                 if (response.route && response.route.legs && response.route.legs.length) {
+                    var lastItem = null;
                     response.route.legs[0].maneuvers.forEach(function (item) {
                         var row = $('<tr />').addClass('point');
                         $('<img />').attr('src', item.iconUrl).appendTo($('<td/>').appendTo(row));
@@ -167,10 +217,15 @@ $(document).ready(function () {
                         textCell.appendTo(row);
 
                         var distCell = $('<td />').addClass('distance');
-                        distCell.html(Convert.toDistance(item.distance))
+                        if (lastItem) {
+                            distCell.html(Convert.toDistance(lastItem.distance))
+                        }
+                        lastItem = item;
                         distCell.appendTo(row);
-
-                    row.appendTo($("#directionsPanel"));
+                        row.appendTo($("#directionsPanel > table"));
+                    });
+                    lastLeg = response.route.legs[0].maneuvers.map(function(m) {
+                        return new L.LatLng(m.startPoint.lat, m.startPoint.lng);
                     });
                 }
                 if (response.route && response.route.shape && response.route.shape.shapePoints) {
