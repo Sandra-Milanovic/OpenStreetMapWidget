@@ -174,28 +174,28 @@ window.Layers = {
     'standard':{
         tiles:'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         options:{
-            attribution:'Copyright (C) OpenStreetMap.org',
+            attribution:'Copyright (C) OpenStreetMap.org. Directions Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">',
             maxZoom:18
         }
     },
     'cycle':{
         tiles:'http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png',
         options:{
-            attribution:'Copyright (C) OpenCycleMap.org',
+            attribution:'Copyright (C) OpenCycleMap.org. Directions Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">',
             maxZoom:18
         }
     },
     'transport':{
         tiles:'http://{s}.tile2.opencyclemap.org/transport/{z}/{x}/{y}.png',
         options:{
-            attribution:'Copyright (C) OpenStreetMap.org',
+            attribution:'Copyright (C) OpenStreetMap.org. Directions Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">',
             maxZoom:18
         }
     },
     'mapquest':{
         tiles:'http://otile{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png',
         options:{
-            attribution:'Copyright (C) MapQuest',
+            attribution:'Copyright (C) MapQuest. Directions Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">',
             maxZoom:18,
             subdomains:['1', '2', '3']
         }
