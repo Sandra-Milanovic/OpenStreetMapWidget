@@ -61,8 +61,14 @@ $(document).ready(function () {
         ];
             audios.forEach(function(item, i) {
                 var a = $("<audio />").attr('data-text', item).attr('preload', 'auto');
-                $("<source />").attr('src', 'audio/' + item + '.mp3').appendTo(a);
-                $("<source />").attr('src', 'audio/' + item + '.ogg').appendTo(a);
+                $("<source />")
+                    .attr('src', 'audio/' + item + '.mp3')
+                    .attr('type', 'audio/mpeg')
+                    .appendTo(a);
+                $("<source />")
+                    .attr('src', 'audio/' + item + '.ogg')
+                    .attr('type', 'audio/ogg')
+                    .appendTo(a);
                 a.appendTo("#audio");
             });
         }
