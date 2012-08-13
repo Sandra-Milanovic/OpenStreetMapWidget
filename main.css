@@ -1,3 +1,12 @@
+table {
+    white-space: inherit;
+    line-height: inherit;
+    font-weight: inherit;
+    font-size: inherit;
+    font-variant: inherit;
+    font-style: inherit;
+}
+
 #editPlacemark .icons .icon {
     height: 32px;
     margin: 5px;
