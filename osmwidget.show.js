@@ -34,10 +34,11 @@ $(document).ready(function () {
     }
     $('.button').button();
     
-    var initAudio = true;
+    var initAudio = true, directionsShown = false;
     $("#directions").click(function () {
         $("#directionsPanel").toggle();
         $("#directionsCompact").toggle();
+        directionsShown = !directionsShown;
         if (initAudio) {
             initAudio = false;
             //loadScript("speakjs/speakClient.js");
@@ -172,7 +173,7 @@ $(document).ready(function () {
                 if (timeRemaining < 7 && timeRemaining > 0 && !audioPlaying) {
 
 
-                    if (compactMode) {
+                    if (directionsShown && compactMode) {
                         var srcImg = current.find("td:eq(0) img").attr('src');
                         var img = $("<div />").css('background-image', 'url(' + srcImg + ')').css({
                             position: 'absolute',

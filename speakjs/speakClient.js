@@ -120,24 +120,15 @@
       if (PROFILE) console.log('speak.js: wav processing took ' + (Date.now()-startTime).toFixed(2) + ' ms');
     }
 
+    //noWorker = true;
     if (noWorker) {
       // Do everything right now. speakGenerator.js must have been loaded.
       var startTime = Date.now();
-      try {
+      //try {
         var wav = generateSpeech(text, args);
-      } catch (e) {
-
-          var callstack = [];
-          var currentFunction = arguments.callee? arguments.callee.caller:null;
-          while (currentFunction) {
-              var fn = currentFunction.toString();
-              var fname = fn.substring(0, fn.indexOf('{')) || 'anonymous';
-              callstack.push(fname);
-              currentFunction = currentFunction.caller;
-          }
-          console.log("generateSpeach error:", e);
-          console.log(callstack);
-      }
+      //} catch (e) {
+      //  console.log("generateSpeach error:", e);
+      //}
       if (PROFILE) console.log('speak.js: processing took ' + (Date.now()-startTime).toFixed(2) + ' ms');
       handleWav(wav);
     } else {
