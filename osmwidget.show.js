@@ -220,7 +220,7 @@ $(document).ready(function () {
                             'icon-dirs-end_sm': 'goal-reached',
                             'rs_slight_left_sm': 'turn-slight-left',
                             'rs_slight_right_sm': 'turn-slight-right',
-                            'rs_straight': 'keep-straight'
+                            'rs_straight_sm': 'keep-straight'
                         }
                         var audio = audioMap[imgseg];
                         var which = $('#audio > audio[data-text="' + audio + '"]');
