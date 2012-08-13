@@ -41,8 +41,13 @@ $(document).ready(function () {
         directionsShown = !directionsShown;
         if (initAudio) {
             initAudio = false;
-            //loadScript("speakjs/speakClient.js");
-            //loadScript("speakjs/speakGenerator.js");
+            var audios = ['turn-left','turn-right', 'turn-slight-left', 'turn-slight-right', 'keep-straight', 'goal-reached'];
+            audios.forEach(function(item, i) {
+                var a = $("<audio />").attr('data-text', item).attr('preload', 'auto');
+                $("<source />").attr('src', 'audio/' + item + '.mp3').appendTo(a);
+                $("<source />").attr('src', 'audio/' + item + '.ogg').appendTo(a);
+                a.appendTo("#audio");
+            });
         }
 
     });
@@ -167,14 +172,18 @@ $(document).ready(function () {
             if (compactMode) $("#directionsPanel tr:gt(" + (id + 1) + ")").hide();
             var distCell = $("#directionsPanel tr:eq(" + id + ") td.distance");
             var curDist = lastLeg[id].distanceTo(srcLoc);
-            if (lastDist && timers % 2 == 0) {
+            if (lastDist && timers % 2 == 1) {
                 var timeRemaining = curDist / ((lastDist - curDist) / 2);
                 //console.log(timeRemaining)
                 if (timeRemaining < 7 && timeRemaining > 0 && !audioPlaying) {
 
 
+                    var srcImg = current.find("td:eq(0) img").attr('src');
+
                     if (directionsShown && compactMode) {
-                        var srcImg = current.find("td:eq(0) img").attr('src');
+                        setTimeout(function() {
+                            img.remove();
+                        }, 3000);
                         var img = $("<div />").css('background-image', 'url(' + srcImg + ')').css({
                             position: 'absolute',
                             top:'33%', left:'33%', 
@@ -183,25 +192,42 @@ $(document).ready(function () {
                             'background-position':'center',
                             'background-repeat':'no-repeat',
                             'background-size':'contain'
-                        }).appendTo('body');
-                                setTimeout(function() {
-                                    img.remove();
-                                }, 3000);
-                                }
-                    
+                        });
+                        img.appendTo('body');
+                    }
+
                     audioPlaying = true;
-                    var audioText = $("#directionsPanel tr:eq(" + id + ") td.text").text();
-                    console.log("Play audio:", audioText);
-                    
+                   
                     setTimeout(function() { 
                         console.log("play audio force ended");
-                        audioPlaying = false; }, 5000);
+                        audioPlaying = false; 
+                    }, 4000);
 
-                    if (window.speak) speak.play(audioText, {amplitude: 100, wordgap: 0, pitch:100, speed:160, noWorker:true}, function() {
-                        console.log("play audio ended");
-                        audioPlaying = false;
-                    }); 
-                    else { console.log("no window.speak"); }                   
+                    
+                    if (window.speak) {
+                        var audioText = $("#directionsPanel tr:eq(" + id + ") td.text").text();
+                        console.log("Play audio:", audioText);
+                        speak.play(audioText, {amplitude: 100, wordgap: 0, pitch:100, speed:160, noWorker:true}, function() {
+                            console.log("play audio ended");
+                            audioPlaying = false;
+                        });
+                    } 
+                    else {
+                        var imgseg = srcImg.split('/').pop().split('.').shift();
+                        var audioMap = {
+                            'rs_right_sm': 'turn-right',
+                            'rs_left_sm': 'turn-left',
+                            'icon-dirs-end_sm': 'goal-reached',
+                            'rs_slight_left_sm': 'turn-slight-left',
+                            'rs_slight_right_sm': 'turn-slight-right',
+                            'rs_straight': 'keep-straight'
+                        }
+                        var audio = audioMap[imgseg];
+                        var which = $('#audio > audio[data-text="' + audio + '"]');
+                        console.log(which);
+                        which[0].play();
+                        console.log("no window.speak"); 
+                    }
                 }
                 lastDist = null;
             }
