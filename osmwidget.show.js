@@ -258,8 +258,8 @@ $(document).ready(function () {
                         var which = $('#audio > audio[data-text="' + audio + '"]');
                         console.log(which);
                         try {
-                            // workaround for the default android browser
-                            if (navigator.userAgent.indexOf('Android') > -1
+                            // workaround for the default android 4 browser
+                            if (navigator.userAgent.indexOf('Android 4') > -1
                                     && navigator.userAgent.indexOf('WebKit') > -1)
                                 which[0].loop = true;
                             which[0].currentTime = 0;
