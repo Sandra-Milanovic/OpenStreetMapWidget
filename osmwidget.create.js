@@ -172,7 +172,6 @@ $(document).ready(function () {
     /* Editor */
 
 
-    var targetMarker = null;
 
     var polyline = {};
     polyline.all = [];
@@ -344,6 +343,17 @@ $(document).ready(function () {
             }
         };
     };
+    map.on("click", function() {
+        if ($("body > div.menu-closer").length) return;
+        actionBind('mapclick').apply(this, arguments);
+    });
+
+
+    if (tevents.menu == 'longclick') 
+        mapLongPress(map, actionBind('mapmenu'));
+    else
+        map.on("contextmenu", actionBind('mapmenu'));
+
 
 
     var MarkerIcon = L.Icon.extend({
@@ -361,6 +371,7 @@ $(document).ready(function () {
     });
 
 
+    var targetMarker = null;
     var setTarget = function (latlng) {
         if (targetMarker) {
             map.removeLayer(targetMarker);
@@ -373,20 +384,8 @@ $(document).ready(function () {
     };
 
 
-    map.on("click", function() {
-        if ($("body > div.menu-closer").length) return;
-        actionBind('mapclick').apply(this, arguments);
-    });
-
-
-    if (tevents.menu == 'longclick') 
-        mapLongPress(map, actionBind('mapmenu'));
-    else
-        map.on("contextmenu", actionBind('mapmenu'));
-
     // Place button and placement mode switcher
     $("#placeButton").bind('click', function () {
-
         mode = (mode == 'placement' ? 'default' : 'placement');
         if (mode == 'placement') {
             if (targetMarker) map.removeLayer(targetMarker);

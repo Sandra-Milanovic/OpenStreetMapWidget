@@ -27,24 +27,51 @@ $(document).ready(function () {
 
     var params = getParams();
 
-    if ("target" in params) {
-        var markerArray = params.target.split(","),
-            markerLat = markerArray[0],
-            markerLng = markerArray[1];
-    }
     $('.button').button();
     
-    var initAudio = true, directionsShown = false;
+ 
+
+    var directionsShown = false;
     $("#directions").click(function () {
         $("#directionsPanel").toggle();
         $("#directionsCompact").toggle();
         directionsShown = !directionsShown;
-        if (initAudio) {
+        audios.init();
+    });
+
+    var compactMode = false;
+    $("#directionsCompact").click(function() {
+        compactMode = !compactMode;
+    });
+
+
+
+    $("#map").width($(window).width());    
+    $("#map").height($(window).height());
+    var map = new L.Map('map');
+    map.setView(new L.LatLng(params.lat, params.lng), params.zoom);
+
+    switchLayer(map, Layers[params.map]);
+    $("#mapLayer").val(params.map);
+    $("#mapLayer").change(function (e) {
+        var whichLayer = $(this).val();
+        switchLayer(map, Layers[whichLayer]);
+    });
+
+
+
+    // AUDIO
+    
+    var audios = (function() {
+
+        var self = {}, isInit = false;
+
+        var init = self.init = function() {
+            if (isInit) return;
             initAudio = false;
 
             //var audios = ['turn-left','turn-right', 'turn-slight-left', 'turn-slight-right', 'keep-straight', 'goal-reached'];
-            var audios = [
-        'climb-the-ramp'
+            var audios = ['climb-the-ramp'
         ,'goal-reached'
         ,'keep-left'
         ,'keep-right'
@@ -58,44 +85,58 @@ $(document).ready(function () {
         ,'turn-sharp-left'
         ,'turn-sharp-right'
         ,'turn-slight-left'
-        ,'turn-slight-right'
-        ];
+        ,'turn-slight-right'];
             audios.forEach(function(item, i) {
                 var a = $("<audio />").attr('data-text', item).attr('preload', 'auto');
                 $("<source />")
-                    .attr('src', 'audio/' + item + '.mp3')
-                    .attr('type', 'audio/mpeg')
-                    .appendTo(a);
-                $("<source />")
-                    .attr('src', 'audio/' + item + '.ogg')
-                    .attr('type', 'audio/ogg')
-                    .appendTo(a);
-                a.appendTo("#audio");
+                .attr('src', 'audio/' + item + '.mp3')
+                .attr('type', 'audio/mpeg')
+                .appendTo(a);
+            $("<source />")
+                .attr('src', 'audio/' + item + '.ogg')
+                .attr('type', 'audio/ogg')
+                .appendTo(a);
+            a.appendTo("#audio");
             });
         }
+        var audioMap = {
+            "icon-dirs-end_sm":"goal-reached"
+                ,"rs_fork_left2_sm":"keep-left"
+                ,"rs_fork_right2_sm":"keep-right"
+                ,"rs_gr_exitright_sm":"take-exit-right"
+                ,"rs_gr_exitleft_sm":"take-exit-left"
+                ,"rs_left_sm":"turn-left"
+                ,"rs_merge_left_sm":"merge-left"
+                ,"rs_merge_right_sm":"merge-right"
+                ,"rs_ramp_sm":"climb-the-ramp"
+                ,"rs_right_sm":"turn-right"
+                ,"rs_sharp_left_sm":"turn-sharp-left"
+                ,"rs_sharp_right_sm":"turn-sharp-right"
+                ,"rs_slight_left_sm":"turn-slight-left"
+                ,"rs_slight_right_sm":"turn-slight-right"
+                ,"rs_straight_sm":"keep-straight"
+        };
 
-    });
-
-    $("#directionsCompact").click(function() {
-        compactMode = !compactMode;
-    });
-
-    $("#map").width($(window).width());
-    
-    $("#map").height($(window).height());
-    var map = new L.Map('map');
-    map.setView(new L.LatLng(params.lat, params.lng), params.zoom);
-
-    switchLayer(map, Layers[params.map]);
-    $("#mapLayer").val(params.map);
-    $("#mapLayer").change(function (e) {
-        var whichLayer = $(this).val();
-        switchLayer(map, Layers[whichLayer]);
-    });
+        var playIcon = self.playIcon = function(icon) {
+             var audio = audioMap[icon];
+             var which = $('#audio > audio[data-text="' + audio + '"]');
+             try {
+                 // workaround for the default android 4 browser
+                 if (navigator.userAgent.indexOf('Android 4') > -1
+                         && navigator.userAgent.indexOf('WebKit') > -1)
+                     which[0].loop = true;
+                 which[0].currentTime = 0;
+                 which[0].play();
+             } catch (e) {}
+        }
+        
+        return self;
+    }());
 
 
-    var targetMarker = null, myMarker = null, autocenter = false;
 
+
+    var myMarker = null, autocenter = false;
 
     var checkCenterMap = function() {
         if (myMarker && autocenter) { 
@@ -128,6 +169,9 @@ $(document).ready(function () {
         }));
     }
 
+
+
+    var targetMarker = null;
     var createTarget = function(lat, lng) {
         targetLocation = new L.LatLng(markerLat, markerLng);
         targetMarker = new L.Marker(targetLocation, {draggable:true});
@@ -140,31 +184,14 @@ $(document).ready(function () {
         }));
 
     }
-    if ("target" in params) createTarget(markerLat, markerLng);
-            
+    if ("target" in params) { 
+        var markerArray = params.target.split(","),
+            markerLat = markerArray[0],
+                      markerLng = markerArray[1];
+        createTarget(markerLat, markerLng);
+    }
 
-    var compactMode = false;
 
-    var mapMenu = menu({
-        "Set my location": function(e) {
-            if (!myMarker) createMyMarker(e.latlng.lat, e.latlng.lng);
-            else myMarker.setLatLng(e.latlng);
-            checkCenterMap();
-            updateMyMarker = false;
-        },
-        "Set target here": function(e) {
-            if (!targetMarker) createTarget(e.latlng.lat, e.latlng.lng);
-            else targetMarker.setLatLng(e.latlng);
-        }
-    });
-    if (tevents.menu == 'longclick') 
-        mapLongPress(map, mapMenu); 
-    else
-        map.on("contextmenu", mapMenu); 
-
-    map.on('movestart', function() { 
-        autocenter = false; 
-    });
 
     if ("places" in params) {
         params.places.split(",").forEach(function (pStr) {
@@ -189,30 +216,57 @@ $(document).ready(function () {
             }
             var style = {
                 color: '#' + pArr[1],
-                fill: pArr[2] && pArr[2].length > 0,
-                fillColor: pArr[2] && pArr[2].length > 0 ? '#' + pArr[2] : null
+            fill: pArr[2] && pArr[2].length > 0,
+            fillColor: pArr[2] && pArr[2].length > 0 ? '#' + pArr[2] : null
             };
             var type = style.fillColor ? 'Polygon' : 'Polyline';
             map.addLayer(new L[type](latlngs, style));
         });
-    }
+    }           
+
+
+
+    var mapMenu = menu({
+        "Set my location": function(e) {
+            if (!myMarker) createMyMarker(e.latlng.lat, e.latlng.lng);
+            else myMarker.setLatLng(e.latlng);
+            checkCenterMap();
+            updateMyMarker = false;
+        },
+        "Set target here": function(e) {
+            if (!targetMarker) createTarget(e.latlng.lat, e.latlng.lng);
+            else targetMarker.setLatLng(e.latlng);
+        }
+    });
+    if (tevents.menu == 'longclick') 
+        mapLongPress(map, mapMenu); 
+    else
+        map.on("contextmenu", mapMenu); 
+
+    map.on('movestart', function() { 
+        autocenter = false; 
+    });
+
+
 
     var lastPoly, lastRequest = 0, lastLeg = null, lastDist = null;
-
-    // Request directions updates if directions is clicked
     var timers = 0, audioPlaying = false;
     
     setInterval(function() {
         ++timers;
 
 
-        if (!directionsShown || !myMarker || !targetMarker || (new Date().getTime() - lastRequest) < 5000) return;
+        // Request directions updates only if directions is clicked
+        if (!directionsShown || !myMarker || !targetMarker) return;
+
         var srcLoc = myMarker.getLatLng();
         var dstLoc = targetMarker.getLatLng();
 
         if (lastLeg) {
+
+            // Update directions panel with distances and colors
             var minll = closestLatLngPoly(srcLoc, lastLeg);
-            var id = minll.segment + 1;
+            var id = minll.segment + 1;            
             $("#directionsPanel tr").css({color: 'inherit'}).show();
             var done = $("#directionsPanel tr:lt(" + id + ")");
             done.css({color: '#00aa00'});
@@ -222,38 +276,14 @@ $(document).ready(function () {
             if (compactMode) $("#directionsPanel tr:gt(" + (id + 1) + ")").hide();
             var distCell = $("#directionsPanel tr:eq(" + id + ") td.distance");
             var curDist = lastLeg[id].distanceTo(srcLoc);
-            if (lastDist && timers % 2 == 1) {
+            
+            // Play audio if necessary
+            if (lastDist && timers % 3 == 1) {
                 var timeRemaining = curDist / ((lastDist - curDist) / 2);
                 //console.log(timeRemaining)
                 if (timeRemaining < 8 && timeRemaining > 0 && !audioPlaying) {
-
-
-                    var srcImg = current.find("td:eq(0) img").attr('src');
-
-                    if (directionsShown && compactMode) {
-                        setTimeout(function() {
-                            img.remove();
-                        }, 3000);
-                        var img = $("<div />").css('background-image', 'url(' + srcImg + ')').css({
-                            position: 'absolute',
-                            top:'33%', left:'33%', 
-                            'width': '33%',
-                            'height': '33%',
-                            'background-position':'center',
-                            'background-repeat':'no-repeat',
-                            'background-size':'contain'
-                        });
-                        img.appendTo('body');
-                    }
-
-                    audioPlaying = true;
-                   
-                    setTimeout(function() { 
-                        console.log("play audio force ended");
-                        audioPlaying = false; 
-                    }, 4000);
-
-                    
+                    audioPlaying = true;                   
+                    setTimeout(function() { audioPlaying = false; }, 3500);                    
                     if (window.speak) {
                         var audioText = $("#directionsPanel tr:eq(" + id + ") td.text").text();
                         console.log("Play audio:", audioText);
@@ -263,38 +293,14 @@ $(document).ready(function () {
                         });
                     } 
                     else {
+                        var srcImg = current.find("td:eq(0) img").attr('src');
                         var imgseg = srcImg.split('/').pop().split('.').shift();
-                        var audioMap = {"icon-dirs-end_sm":"goal-reached"
-                                ,"rs_fork_left2_sm":"keep-left"
-                                ,"rs_fork_right2_sm":"keep-right"
-                                ,"rs_gr_exitright_sm":"take-exit-right"
-                                ,"rs_gr_exitleft_sm":"take-exit-left"
-                                ,"rs_left_sm":"turn-left"
-                                ,"rs_merge_left_sm":"merge-left"
-                                ,"rs_merge_right_sm":"merge-right"
-                                ,"rs_ramp_sm":"climb-the-ramp"
-                                ,"rs_right_sm":"turn-right"
-                                ,"rs_sharp_left_sm":"turn-sharp-left"
-                                ,"rs_sharp_right_sm":"turn-sharp-right"
-                                ,"rs_slight_left_sm":"turn-slight-left"
-                                ,"rs_slight_right_sm":"turn-slight-right"
-                                ,"rs_straight_sm":"keep-straight"}
-                        var audio = audioMap[imgseg];
-                        var which = $('#audio > audio[data-text="' + audio + '"]');
-                        console.log(which);
-                        try {
-                            // workaround for the default android 4 browser
-                            if (navigator.userAgent.indexOf('Android 4') > -1
-                                    && navigator.userAgent.indexOf('WebKit') > -1)
-                                which[0].loop = true;
-                            which[0].currentTime = 0;
-                            which[0].play();
-                        } catch (e) {}
-                        console.log("no window.speak"); 
+                        audios.playIcon(imgseg);
                     }
                 }
                 lastDist = null;
             }
+
             lastDist = curDist;
             //console.log(curDist);
             distCell.text(Convert.toDistance(curDist / 1000));
@@ -303,10 +309,13 @@ $(document).ready(function () {
        
         if (lastPoly) {
             var minll = closestLatLngPoly(srcLoc, lastPoly.getLatLngs());
-            //console.log("We're still on track!");
+            // dont request if we're still on the last route.
             if (minll.distance < 150) return; 
-        }
+        }            
+        // requests at least 5 seconds apart
+        if ((new Date().getTime() - lastRequest) < 5000) return;
 
+        // Request update
         /*
            callback=e&outFormat=json&routeType=shortest&timeType=1&enhancedNarrative=false
            &shapeFormat=raw&generalize=200&locale=en_GB&unit=m
@@ -367,7 +376,7 @@ $(document).ready(function () {
 
     }, 1000);
 
-    // Request repeated updates.
+    // Request repeated location updates.
     var updateMyMarker = true, lastKnownPosition = null;
     if (navigator.geolocation) {
         navigator.geolocation.watchPosition(function (position) {
