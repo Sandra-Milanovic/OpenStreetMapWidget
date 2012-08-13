@@ -40,7 +40,25 @@ $(document).ready(function () {
         directionsShown = !directionsShown;
         if (initAudio) {
             initAudio = false;
-            var audios = ['turn-left','turn-right', 'turn-slight-left', 'turn-slight-right', 'keep-straight', 'goal-reached'];
+
+            //var audios = ['turn-left','turn-right', 'turn-slight-left', 'turn-slight-right', 'keep-straight', 'goal-reached'];
+            var audios = [
+        'climb-the-ramp'
+        ,'goal-reached'
+        ,'keep-left'
+        ,'keep-right'
+        ,'keep-straight'
+        ,'merge-left'
+        ,'merge-right'
+        ,'take-exit-left'
+        ,'take-exit-right'
+        ,'turn-left'
+        ,'turn-right'
+        ,'turn-sharp-left'
+        ,'turn-sharp-right'
+        ,'turn-slight-left'
+        ,'turn-slight-right'
+        ];
             audios.forEach(function(item, i) {
                 var a = $("<audio />").attr('data-text', item).attr('preload', 'auto');
                 $("<source />").attr('src', 'audio/' + item + '.mp3').appendTo(a);
@@ -214,14 +232,21 @@ $(document).ready(function () {
                     } 
                     else {
                         var imgseg = srcImg.split('/').pop().split('.').shift();
-                        var audioMap = {
-                            'rs_right_sm': 'turn-right',
-                            'rs_left_sm': 'turn-left',
-                            'icon-dirs-end_sm': 'goal-reached',
-                            'rs_slight_left_sm': 'turn-slight-left',
-                            'rs_slight_right_sm': 'turn-slight-right',
-                            'rs_straight_sm': 'keep-straight'
-                        }
+                        var audioMap = {"icon-dirs-end_sm":"goal-reached"
+                                ,"rs_fork_left2_sm":"keep-left"
+                                ,"rs_fork_right2_sm":"keep-right"
+                                ,"rs_gr_exitright_sm":"take-exit-right"
+                                ,"rs_gr_exitleft_sm":"take-exit-left"
+                                ,"rs_left_sm":"turn-left"
+                                ,"rs_merge_left_sm":"merge-left"
+                                ,"rs_merge_right_sm":"merge-right"
+                                ,"rs_ramp_sm":"climb-the-ramp"
+                                ,"rs_right_sm":"turn-right"
+                                ,"rs_sharp_left_sm":"turn-sharp-left"
+                                ,"rs_sharp_right_sm":"turn-sharp-right"
+                                ,"rs_slight_left_sm":"turn-slight-left"
+                                ,"rs_slight_right_sm":"turn-slight-right"
+                                ,"rs_straight_sm":"keep-straight"}
                         var audio = audioMap[imgseg];
                         var which = $('#audio > audio[data-text="' + audio + '"]');
                         console.log(which);
@@ -243,7 +268,7 @@ $(document).ready(function () {
         if (lastPoly) {
             var minll = closestLatLngPoly(srcLoc, lastPoly.getLatLngs());
             //console.log("We're still on track!");
-            if (minll.distance < 100) return; 
+            if (minll.distance < 150) return; 
         }
 
         /*
