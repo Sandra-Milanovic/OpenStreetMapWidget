@@ -121,9 +121,11 @@ window.menu = function (menu) {
         // This enables us to close the menu when we click/touch outside of it.
         var closerDiv = $("<div />").addClass('menu-closer')
             .css({width:$(window).width(), height:$(window).height()})
-            .bind('mousedown touchstart',function () {
-                menuDiv.remove();
-                closerDiv.remove();
+            .bind(tevents.up,function () {
+                setTimeout(function() {
+                    menuDiv.remove();
+                    closerDiv.remove();
+                }, 1);
             }).appendTo('body');
         if (L.Browser.touch) closerDiv.css({'background-color':'rgba(0,0,0,0.33)'});
         // get the menu on top of everything
