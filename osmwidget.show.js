@@ -225,7 +225,10 @@ $(document).ready(function () {
                         var audio = audioMap[imgseg];
                         var which = $('#audio > audio[data-text="' + audio + '"]');
                         console.log(which);
-                        which[0].play();
+                        try {
+                            which[0].currentTime = 0;
+                            which[0].play();
+                        } catch (e) {}
                         console.log("no window.speak"); 
                     }
                 }
