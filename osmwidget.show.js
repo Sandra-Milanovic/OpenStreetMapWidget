@@ -1,3 +1,4 @@
+//debug('192.168.88.158:8080');
 var getParams = function () {
     var params = {};
     var paramArray = window.location.search.substr(1).split("&");
@@ -257,6 +258,10 @@ $(document).ready(function () {
                         var which = $('#audio > audio[data-text="' + audio + '"]');
                         console.log(which);
                         try {
+                            // workaround for the default android browser
+                            if (navigator.userAgent.indexOf('Android') > -1
+                                    && navigator.userAgent.indexOf('WebKit') > -1)
+                                which[0].loop = true;
                             which[0].currentTime = 0;
                             which[0].play();
                         } catch (e) {}
