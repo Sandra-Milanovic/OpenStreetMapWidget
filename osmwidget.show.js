@@ -94,7 +94,15 @@ $(document).ready(function () {
     });
 
 
-    var targetMarker = null, myMarker = null;
+    var targetMarker = null, myMarker = null, autocenter = false;
+
+
+    var checkCenterMap = function() {
+        if (myMarker && autocenter) { 
+            map.setView(myMarker.getLatLng(), map.getZoom());
+            autocenter = true; // otherwise move triggers and autocenter resets.
+        }
+    }
 
     var createMyMarker = function(lat, lng) {
         myMarker = new L.Marker(new L.LatLng(lat, lng), {draggable:true});
@@ -103,11 +111,19 @@ $(document).ready(function () {
         myMarker.on('dragstart', function() {
             updateMyMarker = false; 
         });
+        myMarker.on('dragend', function() {
+            checkCenterMap();
+        });
+
+
         myMarker.on(tevents.menu, menu({
             "Follow my location": function() {
                 if (lastKnownPosition)
                     myMarker.setLatLng(new L.LatLng(lastKnownPosition.lat, lastKnownPosition.lng));
                 updateMyMarker = true;
+            },
+            "Autocenter map": function() {
+                autocenter = true;
             }
         }));
     }
@@ -132,6 +148,7 @@ $(document).ready(function () {
         "Set my location": function(e) {
             if (!myMarker) createMyMarker(e.latlng.lat, e.latlng.lng);
             else myMarker.setLatLng(e.latlng);
+            checkCenterMap();
             updateMyMarker = false;
         }        
     });
@@ -140,6 +157,9 @@ $(document).ready(function () {
     else
         map.on("contextmenu", mapMenu); 
 
+    map.on('movestart', function() { 
+        autocenter = false; 
+    });
 
     if ("places" in params) {
         params.places.split(",").forEach(function (pStr) {
@@ -200,7 +220,7 @@ $(document).ready(function () {
             if (lastDist && timers % 2 == 1) {
                 var timeRemaining = curDist / ((lastDist - curDist) / 2);
                 //console.log(timeRemaining)
-                if (timeRemaining < 7 && timeRemaining > 0 && !audioPlaying) {
+                if (timeRemaining < 8 && timeRemaining > 0 && !audioPlaying) {
 
 
                     var srcImg = current.find("td:eq(0) img").attr('src');
@@ -352,6 +372,7 @@ $(document).ready(function () {
                 createMyMarker(position.coords.latitude, position.coords.longitude);
             else
                 myMarker.setLatLng(new L.LatLng(position.coords.latitude, position.coords.longitude));
+            checkCenterMap();
                                             
         }, null, {enableHighAccuracy:true});
     }
