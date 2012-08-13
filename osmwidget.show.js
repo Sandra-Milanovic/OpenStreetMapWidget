@@ -148,14 +148,15 @@ $(document).ready(function () {
     }
 
     var lastPoly, lastRequest = 0, lastLeg = null, lastDist = null;
-    // Request directions updates every 60 seconds
+
+    // Request directions updates if directions is clicked
     var timers = 0, audioPlaying = false;
     
     setInterval(function() {
         ++timers;
 
 
-        if (!myMarker || !targetMarker || (new Date().getTime() - lastRequest) < 5000) return;
+        if (!directionsShown || !myMarker || !targetMarker || (new Date().getTime() - lastRequest) < 5000) return;
         var srcLoc = myMarker.getLatLng();
         var dstLoc = targetMarker.getLatLng();
 
