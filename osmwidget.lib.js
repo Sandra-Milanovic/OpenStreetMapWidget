@@ -121,7 +121,7 @@ window.menu = function (menu) {
         // This enables us to close the menu when we click/touch outside of it.
         var closerDiv = $("<div />").addClass('menu-closer')
             .css({width:$(window).width(), height:$(window).height()})
-            .bind(tevents.up,function () {
+            .bind(tevents.up, function () {
                 setTimeout(function() {
                     menuDiv.remove();
                     closerDiv.remove();
@@ -281,8 +281,10 @@ osmTooltip = (function () {
         tooltip = $("<div />").hide()
             .addClass('ui-widget-content').addClass('tooltip')
             .appendTo('body');
-        tooltip.bind('touchend mouseup', function () {
-            tooltip.hide();
+        tooltip.bind(tevents.up, function () {
+            setTimeout(function() {
+                tooltip.hide();
+            }, 1);
         });
     };
 

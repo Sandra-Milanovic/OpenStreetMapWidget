@@ -128,9 +128,7 @@ $(document).ready(function () {
         }));
     }
 
-    if ("target" in params) {
-
-
+    var createTarget = function(lat, lng) {
         targetLocation = new L.LatLng(markerLat, markerLng);
         targetMarker = new L.Marker(targetLocation, {draggable:true});
         targetMarker.setIcon(new MarkerIcon({iconUrl:icons.urlPrefix + 'regroup.png'}));
@@ -140,7 +138,10 @@ $(document).ready(function () {
                 targetMarker.setLatLng(targetLocation);
             }
         }));
+
     }
+    if ("target" in params) createTarget(markerLat, markerLng);
+            
 
     var compactMode = false;
 
@@ -150,7 +151,11 @@ $(document).ready(function () {
             else myMarker.setLatLng(e.latlng);
             checkCenterMap();
             updateMyMarker = false;
-        }        
+        },
+        "Set target here": function(e) {
+            if (!targetMarker) createTarget(e.latlng.lat, e.latlng.lng);
+            else targetMarker.setLatLng(e.latlng);
+        }
     });
     if (tevents.menu == 'longclick') 
         mapLongPress(map, mapMenu); 
