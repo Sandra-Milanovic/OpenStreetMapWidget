@@ -1,4 +1,3 @@
-//debug("192.168.1.116:8080");
 var getParams = function () {
     var params = {};
     var paramArray = window.location.search.substr(1).split("&");
