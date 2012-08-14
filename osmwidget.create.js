@@ -438,7 +438,7 @@ $(document).ready(function () {
 
         var paramsObj = {
             lat:mapPosition.lat.toFixed(5),
-            lng:mapPosition.lng.toFixed(5),
+            lon:mapPosition.lng.toFixed(5),
             zoom:mapZoom,
             map:window.whichLayer,
             target: targetMarker != undefined ? (targetMarker.getLatLng().lat.toFixed(5) + "," + targetMarker.getLatLng().lng.toFixed(5)) : null,

@@ -49,6 +49,9 @@ $(document).ready(function () {
     $("#map").width($(window).width());    
     $("#map").height($(window).height());
     var map = new L.Map('map');
+
+    if (params.lon) params.lng = params.lon;
+
     map.setView(new L.LatLng(params.lat, params.lng), params.zoom);
 
     switchLayer(map, Layers[params.map]);
