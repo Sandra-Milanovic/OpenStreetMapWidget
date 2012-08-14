@@ -152,6 +152,11 @@ $(document).ready(function () {
         myMarker.on('dragstart', function() {
             updateMyMarker = false; 
         });
+        myMarker.on('drag', function() {
+            var ll = myMarker.getLatLng();
+            ll.ts = new Date().getTime();
+            speedMeasurer.push(ll);
+        });
         myMarker.on('dragend', function() {
             checkCenterMap();
         });
@@ -278,10 +283,11 @@ $(document).ready(function () {
             var curDist = lastLeg[id].distanceTo(srcLoc);
             
             // Play audio if necessary
-            if (lastDist && timers % 3 == 1) {
-                var timeRemaining = curDist / ((lastDist - curDist) / 2);
-                //console.log(timeRemaining)
-                if (timeRemaining < 8 && timeRemaining > 0 && !audioPlaying) {
+            if (lastDist && timers % 2 == 1) {
+                //var timeRemaining = curDist / ((lastDist - curDist) / 2);
+                var timeRemaining = curDist / speedMeasurer.get();
+                console.log(timeRemaining)
+                if (timeRemaining < 5 && lastDist - curDist > 0.001 && !audioPlaying) {
                     audioPlaying = true;                   
                     setTimeout(function() { audioPlaying = false; }, 3500);                    
                     if (window.speak) {
@@ -310,7 +316,7 @@ $(document).ready(function () {
         if (lastPoly) {
             var minll = closestLatLngPoly(srcLoc, lastPoly.getLatLngs());
             // dont request if we're still on the last route.
-            if (minll.distance < 150) return; 
+            if (minll.distance < 100) return; 
         }            
         // requests at least 5 seconds apart
         if ((new Date().getTime() - lastRequest) < 5000) return;
@@ -376,16 +382,33 @@ $(document).ready(function () {
 
     }, 1000);
 
+
+    var speedMeasurer = (function() {
+        var self = {};
+        var locs = [];
+        var push = self.push = function(loc) {
+            locs.push(loc);
+            while (locs.length && loc.ts - locs[0].ts > 5000) locs.shift();
+        }
+        var get = self.get = function() {
+            var l2 = locs[locs.length - 1], l1 = locs[0];
+            return l2.distanceTo(l1) / ((l2.ts - l1.ts) / 1000);
+        } 
+        return self;
+    }());
     // Request repeated location updates.
     var updateMyMarker = true, lastKnownPosition = null;
     if (navigator.geolocation) {
         navigator.geolocation.watchPosition(function (position) {
             lastKnownPosition = {lat: position.coords.latitude, lng: position.coords.longitude};
             if (!updateMyMarker) return;
+            var latlng = new L.LatLng(position.coords.latitude, position.coords.longitude);
             if (!myMarker) 
                 createMyMarker(position.coords.latitude, position.coords.longitude);
             else
-                myMarker.setLatLng(new L.LatLng(position.coords.latitude, position.coords.longitude));
+                myMarker.setLatLng(latlng);
+            latlng.ts = new Date().getTime();
+            speedMeasurer.push(latlng);
             checkCenterMap();
                                             
         }, null, {enableHighAccuracy:true});
