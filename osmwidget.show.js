@@ -286,7 +286,7 @@ $(document).ready(function () {
             if (lastDist && timers % 2 == 1) {
                 //var timeRemaining = curDist / ((lastDist - curDist) / 2);
                 var timeRemaining = curDist / speedMeasurer.get();
-                console.log(timeRemaining)
+                //console.log(timeRemaining)
                 if (timeRemaining < 5 && lastDist - curDist > 0.001 && !audioPlaying) {
                     audioPlaying = true;                   
                     setTimeout(function() { audioPlaying = false; }, 3500);                    
