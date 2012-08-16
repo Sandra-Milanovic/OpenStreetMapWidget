@@ -117,7 +117,7 @@ window.menu = function (menu) {
                 setTimeout(function() {
                     menuDiv.remove();
                     closerDiv.remove();
-                }, 1);
+                }, 100);
             }).appendTo('body');
         if (L.Browser.touch) closerDiv.css({'background-color':'rgba(0,0,0,0.33)'});
         // get the menu on top of everything
@@ -289,7 +289,7 @@ osmTooltip = (function () {
         tooltip.bind(tevents.up, function () {
             setTimeout(function() {
                 tooltip.hide();
-            }, 1);
+            }, 100);
         });
     };
 
@@ -323,7 +323,6 @@ var extractXY = function (event) {
                 startPos = extractXY(e);
                 e.latlng = map.containerPointToLatLng(new L.Point(startPos.x, startPos.y));
                 t = setTimeout(function () {
-                    console.log("map longpress");
                     fn.call(map, e);
                     t = null;
                 }, 650); // 700ms to give priority to marker long press
