@@ -198,6 +198,7 @@ $(document).ready(function () {
 
             var polyMarkMenu = menu({
                 "Stop drawing": function() {
+                    osmTooltip(osmw.help.afterTargetPlaced);
                     mode = 'default';
                 },
                 "Remove point":function () {
@@ -312,6 +313,10 @@ $(document).ready(function () {
                     polyline.current = polyline.create(e.latlng);
                     polyline.all.push(polyline.current);
                     mode = 'polyedit';
+                    osmTooltip(osmw.help.startDrawing);                    
+                },
+                "Put target here": function(e) {
+                    setTarget(e.latlng);
                 }
             })
         },
@@ -328,6 +333,7 @@ $(document).ready(function () {
             },
             mapmenu:menu({
                 "Stop drawing":function (e) {
+                    osmTooltip(osmw.help.afterTargetPlaced);
                     mode = 'default';
                 }
             })

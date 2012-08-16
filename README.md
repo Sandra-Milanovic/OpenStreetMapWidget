@@ -40,7 +40,8 @@ Some notes:
   also included, it doesn't work on smartphones and its not presently in use.
 
 * Usability could be improved by adding more guidance (for example explaining the 
-  availabilitt of advanced rightclick/longpress actions would help)
+  availabilitt of advanced rightclick/longpress actions to the recipient of the
+  map)
 
 Check out the [demonstration](http://sandra-milanovic.github.com/OpenStreetMapWidget/)
 

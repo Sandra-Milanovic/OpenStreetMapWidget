@@ -233,7 +233,6 @@ window.latLngCoder = (function (map) {
      * @return object with lat and lng
      */
     self.decode = function (c) {
-        console.log(decodenum(c.substr(0, 5)));
         return {lat:decodenum(c.substr(0, 5)) / 1000000, lng:decodenum(c.substr(5)) / 1000000};
     };
     return self;
@@ -244,10 +243,24 @@ window.osmw = {};
 window.osmw.help = {
     "initialNoLocation":'Cannot find your location and use it as a target. Use "Set Target" to set the target location',
     "initialBeforeLocation":'Looking for your location. You can set the target using "Set Target" instead',
-    "initial":'Target placed at your location. "Set Target" to change it, "Share Map" to share it.',
+    "initial":'Target placed at your location. "Share Map" to share it, {rightclick} on map for more...',
     "beforeTarget":'"Set Target" to change the target location.',
-    "afterTarget":'Click or tap anywhere on the map to set the target there',
-    "afterTargetPlaced":'"Share Map" to share this target, "Set Target" to change target'
+    "afterTarget":'{Click} anywhere on the map to set the target there',
+    "afterTargetPlaced":'"Share Map" to share this map, "Set Target" to change target, {rightclick} the map for more...',
+    "startDrawing": '{Click} on the map to draw, drag a point to move it, {rightclick} a point for more...'
+};
+
+
+window.osmw.helpproc = function(txt) {
+    var words = {
+        'Click': 'Tap',
+        'rightclick': 'long press'
+    };
+    for (var key in words) {
+        var w = L.Browser.touch ? words[key] : key;
+        txt = txt.replace('{'+key+'}', w);
+    }
+    return txt;
 };
 
 (function () {
@@ -284,7 +297,7 @@ osmTooltip = (function () {
         if (!tooltip) init();
         if (!text) tooltip.hide();
         else {
-            tooltip.text(text).show();
+            tooltip.text(osmw.helpproc(text)).show();
         }
     }
 }());
