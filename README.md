@@ -21,7 +21,7 @@ maps that don't require any external applications to be shown or shared
 
 Hopefully this project might just be able to bring a change in the way people 
 explain the location of places to eachother. No more confusing references
-to other potentially unknown places: instead, a plan hyperlink to a map providing
+to other potentially unknown places: instead, a plain hyperlink to a map providing
 turn by turn voice directions can be sent with just 3 simple clicks.
 
 This project was possible thanks to [OpenStreetMap](http://openstreetmap.org), 
