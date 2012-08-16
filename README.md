@@ -26,7 +26,7 @@ turn by turn voice directions can be sent with just 3 simple clicks.
 
 This project was possible thanks to [OpenStreetMap](http://openstreetmap.org), 
 [MapQuest OpenDirections](http://developer.mapquest.com/web/products/open/directions-service), 
-[Leaflet](http://leaflet.cloudmade.com/) and [google-maps-icons](http://code.google.com/p/google-maps-icons/)
+[Leaflet](http://leaflet.cloudmade.com/), [google-maps-icons](http://code.google.com/p/google-maps-icons/)
 and [Bitly](https://bitly.com/)
 
 Some notes:
@@ -35,12 +35,12 @@ Some notes:
   In this sense Bitly also acts a database. This should also help with
   privacy concerns (your location isn't really stored anywhere)
 
-* Voice directions sounds are pre-made with a espeak and played back using HTML5 audio. 
+* Voice directions sounds are pre-made with [espeak](http://espeak.sourceforge.net/) and played back using HTML5 audio. 
   A builder script is included in the audio dir. Though an espeak port to JS is 
   also included, it doesn't work on smartphones and its not presently in use.
 
 * Usability could be improved by adding more guidance (for example explaining the 
-  availabilitt of advanced rightclick/longpress actions to the recipient of the
+  availability of advanced rightclick/longpress actions to the recipient of the
   map)
 
 Check out the [demonstration](http://sandra-milanovic.github.com/OpenStreetMapWidget/)
