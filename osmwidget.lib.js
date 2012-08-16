@@ -1,11 +1,3 @@
-/**
- * Created with IntelliJ IDEA.
- * User: sandra
- * Date: 6/11/12
- * Time: 6:26 PM
- * To change this template use File | Settings | File Templates.
- */
-
 
 var icons = {
     urlPrefix:'http://google-maps-icons.googlecode.com/files/',
