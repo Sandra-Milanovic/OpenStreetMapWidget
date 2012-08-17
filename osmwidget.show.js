@@ -181,7 +181,7 @@ $(document).ready(function () {
 
     var targetMarker = null;
     var createTarget = function(lat, lng) {
-        targetLocation = new L.LatLng(markerLat, markerLng);
+        targetLocation = new L.LatLng(lat, lng);
         targetMarker = new L.Marker(targetLocation, {draggable:true});
         targetMarker.setIcon(new MarkerIcon({iconUrl:icons.urlPrefix + 'regroup.png'}));
         map.addLayer(targetMarker);
