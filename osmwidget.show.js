@@ -334,7 +334,7 @@ $(document).ready(function () {
         lastRequest = new Date().getTime();
         $.getJSON('http://open.mapquestapi.com/directions/v0/route?callback=?', {
             outFormat:'json',
-            routeType:'shortest', // make options for this
+            routeType:'fastest', // make options for this
             timeType:1, // options
             enhancedNarrative:true,
             narrativeType:'microformat',
