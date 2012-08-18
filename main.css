@@ -262,6 +262,11 @@ div.tooltip {
 #directionsPanel .point td {
     padding:0.25em 0.5em;
 }
+
+#directionsPanel .point td.distance {
+    width:4.5em;
+}
+
 #directionsPanel .point  {
     clear:both;
 }
