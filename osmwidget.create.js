@@ -36,7 +36,7 @@ $(window).resize(function () {
 
 $(document).ready(function () {
 
-    debug("192.168.178.30:8080");
+    //debug("192.168.178.30:8080");
 
 
     $('a.button').button();
