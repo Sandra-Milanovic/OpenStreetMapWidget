@@ -36,7 +36,7 @@ $(window).resize(function () {
 
 $(document).ready(function () {
 
-    //debug("192.168.43.50:8080");
+    debug("192.168.178.30:8080");
 
 
     $('a.button').button();
@@ -300,8 +300,7 @@ $(document).ready(function () {
 
     var mode = 'default';
     var modes = {
-
-        default:{
+        'default':{
             mapclick:function () {
 
             },
@@ -346,7 +345,7 @@ $(document).ready(function () {
                 modes[mode][action].apply(this, arguments);
             }
             else {
-                modes.default[action].apply(this, arguments);
+                modes['default'][action].apply(this, arguments);
             }
         };
     };
